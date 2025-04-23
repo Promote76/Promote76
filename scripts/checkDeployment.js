@@ -7,7 +7,10 @@ const axios = require("axios");
 const TX_HASHES = [
   "0xdffb6f9d50969ff342c1db8e33c2a51c1a6becf951c0c6270eadbe660fd9793c",
   "0x2bf937ff30b959d3efa5b2f48e7defb594753b29b5a16612ab613b2769db6a06",
-  "0x2cbc8be1eb64a1312b730182687d41b9c4cabfec8ec1e0c92728ee903de4ab02"
+  "0x2cbc8be1eb64a1312b730182687d41b9c4cabfec8ec1e0c92728ee903de4ab02",
+  "0x979b26e4ff13567a1cc367a0793e1ab5b41cb43660ddb50fca51cb8818abcf5e",
+  "0x04f99ec9814ada590d91696773eb4396d9726f4d621e3323da943639b8829ab1",
+  "0x639d9552fea4331f8d10e1a07d79997d4818b0525dbdc9c33248dbfcc3a8a1bf"
   // Add any new transaction hashes here
 ];
 
@@ -43,7 +46,23 @@ async function main() {
           
           // If we have a contract address, try to interact with it
           try {
-            const contract = await ethers.getContractAt("SovranWealthFund", receipt.contractAddress);
+            // Try with the minimal contract first, then fall back to full contract
+            let contract;
+            let contractType = "Unknown";
+            
+            try {
+              contract = await ethers.getContractAt("SovranWealthFundMinimal", receipt.contractAddress);
+              contractType = "SovranWealthFundMinimal";
+            } catch (e) {
+              try {
+                contract = await ethers.getContractAt("SovranWealthFund", receipt.contractAddress);
+                contractType = "SovranWealthFund";
+              } catch (e2) {
+                throw new Error("Could not connect to either contract type");
+              }
+            }
+            
+            console.log("Contract type:", contractType);
             const name = await contract.name();
             const symbol = await contract.symbol();
             const totalSupply = await contract.totalSupply();

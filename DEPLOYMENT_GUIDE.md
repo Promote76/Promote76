@@ -33,10 +33,26 @@ npm install
 npx hardhat run scripts/deployAmoy.js --network amoy
 ```
 
-### Minimal Gas Deployment (Requires ~0.11 POL)
+### Minimal Gas Deployment Options
+
+#### Option 1: Optimized Original Contract (Requires ~0.11 POL)
 
 ```bash
 npx hardhat run scripts/deployAmoyMinimal.js --network amoy
+```
+
+#### Option 2: Ultra-Optimized Contract (Requires ~0.09 POL)
+
+```bash
+npx hardhat run scripts/deployAmoyUltra.js --network amoy
+```
+
+#### Option 3: Minimal Contract Version (Requires ~0.07 POL)
+
+This uses a simplified contract with core functionality but reduced gas costs:
+
+```bash
+npx hardhat run scripts/deployMinimalContract.js --network amoy
 ```
 
 The deployment process may take several minutes on the Amoy testnet due to network congestion. Once completed, you'll receive a contract address.
@@ -66,12 +82,21 @@ Replace `YOUR_CONTRACT_ADDRESS` with your actual deployed contract address.
 
 ## Token Features and Interaction
 
+### Contract Types
+
+This project includes two contract versions:
+
+1. **Full Featured Contract (SovranWealthFund)** - Includes role-based access control, pausable functionality, and burn capabilities.
+2. **Minimal Contract (SovranWealthFundMinimal)** - A simplified version with reduced gas costs but still maintains core functionality.
+
 ### Minting New Tokens
+
+#### For the Full Contract:
 
 Only addresses with the `MINTER_ROLE` can mint new tokens. The deployer address and the Treasury address (0x26A8401287cE33CC4aeb5a106cd6D282a92Cf51d) are granted this role by default.
 
 ```javascript
-// Example minting script (scripts/mint.js)
+// Example minting script for full contract
 async function main() {
   const [deployer] = await ethers.getSigners();
   const tokenAddress = "YOUR_CONTRACT_ADDRESS"; // Replace with actual address
@@ -86,6 +111,26 @@ async function main() {
 }
 ```
 
+#### For the Minimal Contract:
+
+Only the owner or Treasury address can mint tokens.
+
+```javascript
+// Example minting script for minimal contract
+async function main() {
+  const [deployer] = await ethers.getSigners();
+  const tokenAddress = "YOUR_CONTRACT_ADDRESS"; // Replace with actual address
+  const token = await ethers.getContractAt("SovranWealthFundMinimal", tokenAddress);
+  
+  const recipient = "RECIPIENT_ADDRESS"; // Address to receive tokens
+  const amount = ethers.utils.parseEther("1000"); // 1000 tokens (with 18 decimals)
+  
+  const tx = await token.mint(recipient, amount);
+  await tx.wait();
+  console.log(`Minted ${ethers.utils.formatEther(amount)} tokens to ${recipient}`);
+}
+```
+
 Run with:
 ```bash
 npx hardhat run scripts/mint.js --network amoy
@@ -93,15 +138,17 @@ npx hardhat run scripts/mint.js --network amoy
 
 ### Pausing and Unpausing Transfers
 
+**Note**: This feature is only available in the full contract version.
+
 Only the contract owner can pause and unpause token transfers:
 
 ```javascript
-// Pause transfers
+// Pause transfers (SovranWealthFund contract only)
 const tx = await token.pause();
 await tx.wait();
 console.log("Token transfers paused");
 
-// Unpause transfers
+// Unpause transfers (SovranWealthFund contract only)
 const tx = await token.unpause();
 await tx.wait();
 console.log("Token transfers unpaused");
@@ -109,9 +156,10 @@ console.log("Token transfers unpaused");
 
 ### Burning Tokens
 
-Any token holder can burn their own tokens:
+Any token holder can burn their own tokens in both contract versions:
 
 ```javascript
+// Burning works the same for both contract versions
 const amount = ethers.utils.parseEther("100"); // 100 tokens
 const tx = await token.burn(amount);
 await tx.wait();
