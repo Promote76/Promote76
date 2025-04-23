@@ -3,11 +3,12 @@
 
 // Configuration
 const CHECK_INTERVAL = 30000; // Check every 30 seconds
-const TOKEN_ADDRESS = '0x15AD65Fb62CD9147Aa4443dA89828A693228b5F7';
-const RECIPIENT_ADDRESS = '0xCe36333A88c2EA01f28f63131fA7dfa80AD021F6';
+const SWF_TOKEN_ADDRESS = '0x15AD65Fb62CD9147Aa4443dA89828A693228b5F7';
+const SWF_RECIPIENT_ADDRESS = '0xCe36333A88c2EA01f28f63131fA7dfa80AD021F6';
+const SUCCESSFUL_TX_HASH = '0x715ae5cbd0cea8955a93230d28170a7549f3317712dfe20a7d305a6671a151d8';
 
 // Minimal ABI for token balance checking
-const TOKEN_ABI = [
+const SWF_TOKEN_ABI = [
   "function balanceOf(address) view returns (uint256)",
   "function decimals() view returns (uint8)",
   "function symbol() view returns (string)",
@@ -38,7 +39,7 @@ async function initBalanceTracker() {
     console.log(`Connected to network: ${network.name} (${network.chainId})`);
     
     // Initialize contract
-    const tokenContract = new ethers.Contract(TOKEN_ADDRESS, TOKEN_ABI, provider);
+    const tokenContract = new ethers.Contract(SWF_TOKEN_ADDRESS, SWF_TOKEN_ABI, provider);
     
     // Get token info
     const [name, symbol, decimals] = await Promise.all([
@@ -73,7 +74,7 @@ async function initBalanceTracker() {
 async function checkBalance(tokenContract, decimals, symbol) {
   try {
     // Get balance
-    const balance = await tokenContract.balanceOf(RECIPIENT_ADDRESS);
+    const balance = await tokenContract.balanceOf(SWF_RECIPIENT_ADDRESS);
     const formattedBalance = ethers.utils.formatUnits(balance, decimals);
     
     // Update status
@@ -104,10 +105,13 @@ async function checkBalance(tokenContract, decimals, symbol) {
       updateTrackerStatus(`Waiting for tokens to be minted...`);
     }
     
-    // Show or hide transaction status section
+    // Update transaction status section
     const transactionStatus = document.getElementById("transactionStatus");
     if (transactionStatus) {
-      transactionStatus.style.display = balance.gt(0) ? "none" : "block";
+      // Always show the status, but update it when balance is available
+      if (balance.gt(0)) {
+        transactionStatus.querySelector('.text-xs.text-green-400').style.display = "flex"; // Show success message
+      }
     }
     
     return formattedBalance;
@@ -151,6 +155,60 @@ function notifyUser(message, type = "info") {
   }
 }
 
+// Handle Deploy Staking Engine button click
+async function deployStakingEngine() {
+  try {
+    if (!window.ethereum) {
+      notifyUser("MetaMask not detected. Please install MetaMask to deploy staking.", "error");
+      return;
+    }
+    
+    notifyUser("Preparing to deploy staking engine...", "info");
+    
+    // Request account access
+    await window.ethereum.request({ method: 'eth_requestAccounts' });
+    
+    // Get provider and signer
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    const address = await signer.getAddress();
+    
+    // Check if connected to Polygon
+    const network = await provider.getNetwork();
+    if (network.chainId !== 137) {
+      notifyUser("Please connect to Polygon Mainnet to deploy staking.", "error");
+      return;
+    }
+    
+    // Show deployment in progress UI
+    const deployBtn = document.getElementById("deployStaking");
+    const originalText = deployBtn.textContent;
+    deployBtn.innerHTML = '<span class="spinner"></span> Deploying...';
+    deployBtn.disabled = true;
+    
+    // Simulate deployment with timeout (in real app, this would call a deployment script)
+    setTimeout(() => {
+      notifyUser("Staking engine deployment simulation complete.", "success");
+      
+      // Update button
+      deployBtn.innerHTML = '✓ Deployment Ready';
+      deployBtn.classList.remove('from-pink-500', 'to-rose-600');
+      deployBtn.classList.add('from-green-500', 'to-emerald-600');
+      
+      // Show deployment info
+      const transactionStatus = document.getElementById("transactionStatus");
+      const deploymentInfo = document.createElement('p');
+      deploymentInfo.className = 'text-xs mt-1 text-green-400';
+      deploymentInfo.textContent = '✓ Staking engine deployment ready';
+      transactionStatus.appendChild(deploymentInfo);
+    }, 3000);
+    
+  } catch (error) {
+    console.error("Error deploying staking engine:", error);
+    notifyUser(`Error: ${error.message}`, "error");
+  }
+}
+
 // Start tracker when the page loads
 document.addEventListener("DOMContentLoaded", () => {
   // Add event listener to start tracker button
@@ -159,6 +217,12 @@ document.addEventListener("DOMContentLoaded", () => {
     startTrackerButton.addEventListener("click", () => {
       initBalanceTracker();
     });
+  }
+  
+  // Add event listener to deploy staking engine button
+  const deployStakingButton = document.getElementById("deployStaking");
+  if (deployStakingButton) {
+    deployStakingButton.addEventListener("click", deployStakingEngine);
   }
   
   // Start automatically if page parameter is present

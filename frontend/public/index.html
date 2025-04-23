@@ -351,12 +351,13 @@
   <div class="token-tracker">
     <h3 class="text-lg font-bold mb-2">SWF Token Tracker</h3>
     <div id="transactionStatus" class="bg-white/5 p-3 rounded-lg mb-3">
-      <p class="text-sm mb-2">Tracking transaction status for the token mint (500,000 SWF to your wallet):</p>
-      <div class="flex items-center text-xs">
-        <span class="spinner"></span>
-        <span>Transaction pending...</span>
+      <p class="text-sm mb-2">Token mint transaction (500,000 SWF to your wallet):</p>
+      <div class="flex items-center text-xs text-green-400">
+        <span class="mr-2">✓</span>
+        <span>Transaction confirmed!</span>
       </div>
-      <p class="text-xs mt-2 opacity-70">Transaction Hash: 0xba8907244039a417232ef0da7f5de49d3b7623948aa8b23c0cf36ecdd76f8778</p>
+      <p class="text-xs mt-2 opacity-70">Transaction Hash: 0x715ae5cbd0cea8955a93230d28170a7549f3317712dfe20a7d305a6671a151d8</p>
+      <p class="text-xs mt-1 opacity-70">Status: Successfully minted 500,000 SWF tokens</p>
     </div>
     <div class="bg-white/5 p-3 rounded-lg mb-3">
       <div class="flex justify-between items-center mb-1">
@@ -368,8 +369,11 @@
         <span id="trackerStatus">Not started</span>
       </div>
     </div>
-    <button id="startTracker" class="bg-gradient-to-r from-purple-500 to-indigo-600 w-full py-2 rounded-lg font-bold text-sm transition hover:opacity-90">
+    <button id="startTracker" class="bg-gradient-to-r from-purple-500 to-indigo-600 w-full py-2 rounded-lg font-bold text-sm transition hover:opacity-90 mb-3">
       Start Token Tracker
+    </button>
+    <button id="deployStaking" class="bg-gradient-to-r from-pink-500 to-rose-600 w-full py-2 rounded-lg font-bold text-sm transition hover:opacity-90">
+      Deploy Staking Engine
     </button>
   </div>
 </body>

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sovran Wealth Fund (SWF) - Minimal Dashboard</title>
+  
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #2a0845 0%, #6441a5 100%);
+      color: white;
+      min-height: 100vh;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+    
+    .logo-container {
+      display: flex;
+      align-items: center;
+    }
+    
+    .logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+    }
+    
+    .logo span {
+      color: #2a0845;
+      font-weight: bold;
+    }
+    
+    h1 {
+      font-size: 24px;
+      margin: 0;
+    }
+    
+    .network-badge {
+      background-color: #8247e5;
+      color: white;
+      font-size: 14px;
+      padding: 4px 12px;
+      border-radius: 999px;
+    }
+    
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+    
+    .card {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 32px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .status-box {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 16px;
+    }
+    
+    .success-indicator {
+      display: flex;
+      align-items: center;
+      color: #10b981;
+      font-size: 14px;
+    }
+    
+    .success-indicator span {
+      margin-right: 8px;
+    }
+    
+    .muted-text {
+      opacity: 0.7;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+    
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    
+    @media (min-width: 768px) {
+      .metrics-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    
+    .metric-box {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 16px;
+      transition: all 0.3s ease;
+    }
+    
+    .metric-box:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      transform: translateY(-2px);
+    }
+    
+    .metric-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    
+    .metric-value {
+      font-size: 28px;
+      font-weight: bold;
+    }
+    
+    .metric-unit {
+      font-size: 14px;
+      opacity: 0.7;
+    }
+    
+    .button-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    
+    @media (min-width: 768px) {
+      .button-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    .button {
+      background: linear-gradient(90deg, #00d2ff 0%, #3a7bd5 100%);
+      border: none;
+      color: white;
+      font-weight: bold;
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: opacity 0.3s ease;
+    }
+    
+    .button:hover {
+      opacity: 0.9;
+    }
+    
+    .button.stake {
+      background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+    }
+    
+    .button.deploy {
+      background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%);
+    }
+    
+    .notification {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      background-color: #10b981;
+      color: white;
+      padding: 12px;
+      border-radius: 8px;
+      max-width: 300px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-container">
+      <div class="logo">
+        <span>SWF</span>
+      </div>
+      <h1>Sovran Wealth Fund</h1>
+    </div>
+    
+    <span class="network-badge">Polygon Mainnet</span>
+  </header>
+  
+  <main>
+    <!-- Token Status Card -->
+    <div class="card">
+      <h2>Token Status</h2>
+      <div class="status-box">
+        <p>Token mint transaction (500,000 SWF to your wallet):</p>
+        <div class="success-indicator">
+          <span>✓</span>
+          <span>Transaction confirmed!</span>
+        </div>
+        <p class="muted-text">Transaction Hash: 0x715ae5cbd0cea8955a93230d28170a7549f3317712dfe20a7d305a6671a151d8</p>
+        <p class="muted-text">Status: Successfully minted 500,000 SWF tokens</p>
+      </div>
+
+      <!-- Token Metrics -->
+      <h3>Token Metrics</h3>
+      <div class="metrics-grid">
+        <div class="metric-box">
+          <div class="metric-title">Total Supply</div>
+          <div class="metric-value">500,000</div>
+          <div class="metric-unit">SWF</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-title">Current APR</div>
+          <div class="metric-value">15%</div>
+          <div class="metric-unit">Annual Percentage Rate</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-title">Your Balance</div>
+          <div class="metric-value">500,000</div>
+          <div class="metric-unit">SWF</div>
+        </div>
+      </div>
+      
+      <!-- Action Buttons -->
+      <div class="button-grid">
+        <button class="button stake">Stake Tokens</button>
+        <button class="button deploy">Deploy Staking Engine</button>
+      </div>
+    </div>
+    
+    <!-- Notification -->
+    <div class="notification">
+      <p><strong>Success!</strong></p>
+      <p>500,000 SWF tokens minted successfully</p>
+    </div>
+  </main>
+</body>
+</html>

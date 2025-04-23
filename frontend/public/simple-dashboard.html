@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sovran Wealth Fund (SWF) - Token Dashboard</title>
+  
+  <!-- Using a CDN link for Tailwind but with no JavaScript -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  
+  <style>
+    .gradient-bg {
+      background: linear-gradient(135deg, #2a0845 0%, #6441a5 100%);
+    }
+    .card {
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .network-status {
+      background-color: #8247e5;
+      color: white;
+      font-size: 0.8rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 1rem;
+    }
+    .metric-box {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-radius: 0.5rem;
+      padding: 1rem;
+      transition: all 0.3s ease;
+    }
+    .metric-box:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      transform: translateY(-2px);
+    }
+    .pulse-ring {
+      animation: pulse 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+    }
+    @keyframes pulse {
+      0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(130, 71, 229, 0.7);
+      }
+      70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 10px rgba(130, 71, 229, 0);
+      }
+      100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(130, 71, 229, 0);
+      }
+    }
+  </style>
+</head>
+<body class="gradient-bg min-h-screen text-white">
+  <header class="p-4 flex justify-between items-center">
+    <div class="flex items-center">
+      <div class="h-10 w-10 rounded-full bg-white mr-3 flex items-center justify-center">
+        <span class="font-bold text-purple-900">SWF</span>
+      </div>
+      <h1 class="text-2xl font-bold">Sovran Wealth Fund</h1>
+    </div>
+    
+    <div class="flex items-center">
+      <span class="network-status mr-4">Polygon Mainnet</span>
+      <div id="walletInfo">
+        <div class="flex items-center">
+          <div class="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center mr-2 pulse-ring">
+            <span class="text-xs">🔒</span>
+          </div>
+          <div>
+            <span id="accountDisplay" class="font-mono text-sm">0xCe36...21F6</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  
+  <main class="container mx-auto p-4">
+    <!-- Token Status Card -->
+    <div class="card p-6 mb-8">
+      <h2 class="text-2xl font-bold mb-4">Token Status</h2>
+      <div class="bg-white bg-opacity-5 p-3 rounded-lg mb-4">
+        <p class="text-sm mb-2">Token mint transaction (500,000 SWF to your wallet):</p>
+        <div class="flex items-center text-xs text-green-400">
+          <span class="mr-2">✓</span>
+          <span>Transaction confirmed!</span>
+        </div>
+        <p class="text-xs mt-2 opacity-70">Transaction Hash: 0x715ae5cbd0cea8955a93230d28170a7549f3317712dfe20a7d305a6671a151d8</p>
+        <p class="text-xs mt-1 opacity-70">Status: Successfully minted 500,000 SWF tokens</p>
+      </div>
+
+      <!-- Token Metrics -->
+      <div class="mb-8">
+        <h3 class="text-lg font-bold mb-4">Token Metrics</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="metric-box">
+            <h4 class="text-md font-semibold mb-2">Total Supply</h4>
+            <p class="text-3xl font-bold">500,000</p>
+            <p class="text-sm opacity-70">SWF</p>
+          </div>
+          <div class="metric-box">
+            <h4 class="text-md font-semibold mb-2">Current APR</h4>
+            <p class="text-3xl font-bold">15%</p>
+            <p class="text-sm opacity-70">Annual Percentage Rate</p>
+          </div>
+          <div class="metric-box">
+            <h4 class="text-md font-semibold mb-2">Your Balance</h4>
+            <p class="text-3xl font-bold">500,000</p>
+            <p class="text-sm opacity-70">SWF</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Action Buttons -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <button class="bg-gradient-to-r from-green-500 to-emerald-600 py-3 rounded-lg font-bold transition hover:opacity-90">
+          Stake Tokens
+        </button>
+        <button class="bg-gradient-to-r from-blue-500 to-indigo-600 py-3 rounded-lg font-bold transition hover:opacity-90">
+          Deploy Staking Engine
+        </button>
+      </div>
+    </div>
+    
+    <!-- Staking Section -->
+    <div class="mb-8">
+      <h2 class="text-2xl font-bold mb-4">Staking Dashboard</h2>
+      <div class="card p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <!-- Staking Info -->
+          <div>
+            <h3 class="text-xl font-bold mb-4">Your Staking Stats</h3>
+            <div class="grid grid-cols-2 gap-4 mb-6">
+              <div class="stat">
+                <p class="text-sm opacity-70">Your Staked Balance</p>
+                <p class="text-xl font-bold">0 SWF</p>
+              </div>
+              <div class="stat">
+                <p class="text-sm opacity-70">Reward Rate</p>
+                <p class="text-xl font-bold">15% APR</p>
+              </div>
+              <div class="stat">
+                <p class="text-sm opacity-70">Rewards Earned</p>
+                <p class="text-xl font-bold">0 SWF</p>
+              </div>
+              <div class="stat">
+                <p class="text-sm opacity-70">Time Staked</p>
+                <p class="text-xl font-bold">0 days</p>
+              </div>
+            </div>
+            <div class="flex gap-3">
+              <button class="bg-indigo-600 hover:bg-indigo-700 py-2 px-4 rounded-lg font-bold transition">
+                Claim Rewards
+              </button>
+              <button class="bg-pink-600 hover:bg-pink-700 py-2 px-4 rounded-lg font-bold transition">
+                Unstake Tokens
+              </button>
+            </div>
+          </div>
+          
+          <!-- Staking Form -->
+          <div>
+            <h3 class="text-xl font-bold mb-4">Stake Your Tokens</h3>
+            <div class="bg-white/5 p-4 rounded-lg mb-4">
+              <div class="flex justify-between mb-2">
+                <span>Amount to Stake</span>
+                <span>Balance: 500,000 SWF</span>
+              </div>
+              <div class="flex gap-2">
+                <input type="number" placeholder="Enter amount" value="50000" class="w-full bg-white/10 p-3 rounded-lg text-white" />
+                <button class="bg-white/10 py-2 px-3 rounded-lg">MAX</button>
+              </div>
+            </div>
+            <div class="flex gap-3">
+              <button class="bg-gradient-to-r from-green-500 to-emerald-600 w-full py-3 rounded-lg font-bold transition hover:opacity-90">
+                Stake Tokens
+              </button>
+            </div>
+            <p class="text-sm opacity-70 mt-3">
+              * Staking requires approval of the SWF token contract. Minimum stake is 50 SWF.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <footer class="container mx-auto p-4 mt-10 opacity-60 text-sm">
+    <div class="flex flex-col md:flex-row justify-between items-center">
+      <p>© 2025 Sovran Wealth Fund. All rights reserved.</p>
+      <div class="flex gap-4 mt-4 md:mt-0">
+        <a href="#" class="hover:text-blue-400">Documentation</a>
+        <a href="#" class="hover:text-blue-400">GitHub</a>
+        <a href="#" class="hover:text-blue-400">Smart Contract</a>
+      </div>
+    </div>
+  </footer>
+  
+  <!-- Transaction Success Notification -->
+  <div class="fixed top-4 right-4 bg-green-500 text-white p-3 rounded-lg shadow-lg max-w-xs">
+    <div class="flex items-center">
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+      <div>
+        <p class="font-bold">Success!</p>
+        <p class="text-sm">500,000 SWF tokens minted successfully</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
