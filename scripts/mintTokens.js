@@ -4,10 +4,10 @@ const { ethers } = require("hardhat");
 async function main() {
   try {
     // The wallet address to receive tokens
-    const recipientAddress = "0xCe36...21F6"; // Replace with the full address
+    const recipientAddress = "0xCe36333A88c2EA01f28f63131fA7dfa80AD021F6";
     
     // Amount to mint (in token units, not wei)
-    const amountToMint = "1000000"; // 1 million tokens
+    const amountToMint = "500000"; // 500,000 tokens
     
     // SWF Token contract address from mainnet-contract-info.json
     const swfTokenAddress = "0x15AD65Fb62CD9147Aa4443dA89828A693228b5F7";
