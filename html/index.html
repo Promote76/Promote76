@@ -62,6 +62,26 @@
       text-align: center;
       font-weight: 500;
     }
+    .debug {
+      margin-top: 20px;
+      border: 1px solid #e2e8f0;
+      padding: 15px;
+      border-radius: 8px;
+      background: #f8fafc;
+    }
+    .debug h2 {
+      margin-top: 0;
+      font-size: 1.2rem;
+      color: #475569;
+    }
+    .debug pre {
+      background: #1e293b;
+      color: #f1f5f9;
+      padding: 10px;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 0.9em;
+    }
     .footer {
       text-align: center;
       margin-top: 30px;
@@ -104,10 +124,39 @@
       <p><strong>Role Types:</strong> 5 (BUYER, HOLDER, STAKER, LIQUIDITY, TRACKER)</p>
     </div>
     
+    <div class="debug" id="debugOutput">
+      <h2>API Diagnostics</h2>
+      <button id="testApi">Test API Connection</button>
+      <pre id="apiResult">Click the button to test the API connection</pre>
+    </div>
+    
     <div class="footer">
       <p>Sovran Wealth Fund &copy; 2025</p>
       <p>Last update: April 23, 2025</p>
     </div>
   </div>
+
+  <script>
+    document.getElementById('testApi').addEventListener('click', function() {
+      const resultElement = document.getElementById('apiResult');
+      resultElement.textContent = 'Testing API connection...';
+      
+      fetch("/api/data")
+        .then(async res => {
+          const text = await res.text();
+          resultElement.textContent = 'Raw Response: ' + text;
+          
+          try {
+            const json = JSON.parse(text);
+            resultElement.textContent += '\n\nParsed JSON: ' + JSON.stringify(json, null, 2);
+          } catch (e) {
+            resultElement.textContent += '\n\n❌ JSON Parsing Failed: ' + e.message;
+          }
+        })
+        .catch(err => {
+          resultElement.textContent = '❌ Fetch Failed: ' + err.message;
+        });
+    });
+  </script>
 </body>
 </html>
