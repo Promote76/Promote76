@@ -17,8 +17,8 @@ async function main() {
     
     // Use higher gas price for priority (120 gwei)
     const gasPrice = ethers.utils.parseUnits("120", "gwei");
-    // For the full contract, we need a higher gas limit
-    const gasLimit = 4000000; 
+    // For the full contract, we need a higher gas limit but within our budget
+    const gasLimit = 3000000; 
     
     // Calculate expected cost
     const deploymentCost = ethers.utils.formatEther(
