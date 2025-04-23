@@ -112,7 +112,7 @@ async function checkBalance(address) {
  * @param {string} amount The amount to mint (in token units, not wei)
  */
 async function mintTokens(recipient, amount) {
-  const { contract, signerAddress } = await connect();
+  const { provider, contract, signerAddress } = await connect();
   
   // Validate recipient address
   if (!ethers.utils.isAddress(recipient)) {
@@ -136,11 +136,26 @@ async function mintTokens(recipient, amount) {
   // Parse the amount to wei
   const weiAmount = ethers.utils.parseUnits(amount, TOKEN_DECIMALS);
   
+  // Get current gas prices from the network
+  const gasPrice = await provider.getGasPrice();
+  console.log(`Current gas price: ${ethers.utils.formatUnits(gasPrice, 'gwei')} gwei`);
+  
+  // Set higher gas price to ensure transaction goes through
+  // Using at least 30 gwei or 1.5x current price, whichever is higher
+  const minGasPrice = ethers.utils.parseUnits("30", "gwei");
+  const recommendedGasPrice = gasPrice.mul(15).div(10); // 1.5x current price
+  const finalGasPrice = recommendedGasPrice.gt(minGasPrice) ? recommendedGasPrice : minGasPrice;
+  
+  console.log(`Using gas price: ${ethers.utils.formatUnits(finalGasPrice, 'gwei')} gwei`);
+  
   // Mint tokens
   console.log(`Minting ${amount} ${TOKEN_SYMBOL} to ${recipient}...`);
-  const tx = await contract.mint(recipient, weiAmount);
+  const tx = await contract.mint(recipient, weiAmount, {
+    gasPrice: finalGasPrice,
+    gasLimit: 250000 // Setting an appropriate gas limit
+  });
   console.log(`Transaction hash: ${tx.hash}`);
-  console.log("Waiting for confirmation...");
+  console.log("Waiting for confirmation (this may take a few minutes)...");
   
   // Wait for the transaction to be mined
   const receipt = await tx.wait();
@@ -154,25 +169,43 @@ async function mintTokens(recipient, amount) {
  * Toggle token pause state (pause/unpause)
  */
 async function togglePause() {
-  const { contract } = await connect();
+  const { provider, contract } = await connect();
   
   // Check current pause state
   const isPaused = await contract.paused();
   
+  // Get current gas prices from the network
+  const gasPrice = await provider.getGasPrice();
+  console.log(`Current gas price: ${ethers.utils.formatUnits(gasPrice, 'gwei')} gwei`);
+  
+  // Set higher gas price to ensure transaction goes through
+  // Using at least 30 gwei or 1.5x current price, whichever is higher
+  const minGasPrice = ethers.utils.parseUnits("30", "gwei");
+  const recommendedGasPrice = gasPrice.mul(15).div(10); // 1.5x current price
+  const finalGasPrice = recommendedGasPrice.gt(minGasPrice) ? recommendedGasPrice : minGasPrice;
+  
+  console.log(`Using gas price: ${ethers.utils.formatUnits(finalGasPrice, 'gwei')} gwei`);
+  
   if (isPaused) {
     // Unpause the token
     console.log("Unpausing token transfers...");
-    const tx = await contract.unpause();
+    const tx = await contract.unpause({
+      gasPrice: finalGasPrice,
+      gasLimit: 200000 // Setting an appropriate gas limit
+    });
     console.log(`Transaction hash: ${tx.hash}`);
-    console.log("Waiting for confirmation...");
+    console.log("Waiting for confirmation (this may take a few minutes)...");
     await tx.wait();
     console.log("✅ Token transfers enabled!");
   } else {
     // Pause the token
     console.log("Pausing token transfers...");
-    const tx = await contract.pause();
+    const tx = await contract.pause({
+      gasPrice: finalGasPrice,
+      gasLimit: 200000 // Setting an appropriate gas limit
+    });
     console.log(`Transaction hash: ${tx.hash}`);
-    console.log("Waiting for confirmation...");
+    console.log("Waiting for confirmation (this may take a few minutes)...");
     await tx.wait();
     console.log("⚠️ Token transfers disabled!");
   }
@@ -183,7 +216,7 @@ async function togglePause() {
  * @param {string} address The address to grant the minter role to
  */
 async function grantMinterRole(address) {
-  const { contract, signerAddress } = await connect();
+  const { provider, contract, signerAddress } = await connect();
   
   // Validate address
   if (!ethers.utils.isAddress(address)) {
@@ -198,11 +231,26 @@ async function grantMinterRole(address) {
     return;
   }
   
+  // Get current gas prices from the network
+  const gasPrice = await provider.getGasPrice();
+  console.log(`Current gas price: ${ethers.utils.formatUnits(gasPrice, 'gwei')} gwei`);
+  
+  // Set higher gas price to ensure transaction goes through
+  // Using at least 30 gwei or 1.5x current price, whichever is higher
+  const minGasPrice = ethers.utils.parseUnits("30", "gwei");
+  const recommendedGasPrice = gasPrice.mul(15).div(10); // 1.5x current price
+  const finalGasPrice = recommendedGasPrice.gt(minGasPrice) ? recommendedGasPrice : minGasPrice;
+  
+  console.log(`Using gas price: ${ethers.utils.formatUnits(finalGasPrice, 'gwei')} gwei`);
+  
   // Grant the role
   console.log(`Granting MINTER_ROLE to ${address}...`);
-  const tx = await contract.grantRole(MINTER_ROLE, address);
+  const tx = await contract.grantRole(MINTER_ROLE, address, {
+    gasPrice: finalGasPrice,
+    gasLimit: 200000 // Setting an appropriate gas limit
+  });
   console.log(`Transaction hash: ${tx.hash}`);
-  console.log("Waiting for confirmation...");
+  console.log("Waiting for confirmation (this may take a few minutes)...");
   
   // Wait for the transaction to be mined
   await tx.wait();
@@ -214,7 +262,7 @@ async function grantMinterRole(address) {
  * @param {string} address The address to revoke the minter role from
  */
 async function revokeMinterRole(address) {
-  const { contract } = await connect();
+  const { provider, contract } = await connect();
   
   // Validate address
   if (!ethers.utils.isAddress(address)) {
@@ -229,11 +277,26 @@ async function revokeMinterRole(address) {
     return;
   }
   
+  // Get current gas prices from the network
+  const gasPrice = await provider.getGasPrice();
+  console.log(`Current gas price: ${ethers.utils.formatUnits(gasPrice, 'gwei')} gwei`);
+  
+  // Set higher gas price to ensure transaction goes through
+  // Using at least 30 gwei or 1.5x current price, whichever is higher
+  const minGasPrice = ethers.utils.parseUnits("30", "gwei");
+  const recommendedGasPrice = gasPrice.mul(15).div(10); // 1.5x current price
+  const finalGasPrice = recommendedGasPrice.gt(minGasPrice) ? recommendedGasPrice : minGasPrice;
+  
+  console.log(`Using gas price: ${ethers.utils.formatUnits(finalGasPrice, 'gwei')} gwei`);
+  
   // Revoke the role
   console.log(`Revoking MINTER_ROLE from ${address}...`);
-  const tx = await contract.revokeRole(MINTER_ROLE, address);
+  const tx = await contract.revokeRole(MINTER_ROLE, address, {
+    gasPrice: finalGasPrice,
+    gasLimit: 200000 // Setting an appropriate gas limit
+  });
   console.log(`Transaction hash: ${tx.hash}`);
-  console.log("Waiting for confirmation...");
+  console.log("Waiting for confirmation (this may take a few minutes)...");
   
   // Wait for the transaction to be mined
   await tx.wait();
