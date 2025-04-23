@@ -145,7 +145,8 @@ args = "node simple-deployment-server.js"
 waitForPort = 5000
 
 [deployment]
-run = ["sh", "-c", "npm install --save-dev hardhat @nomiclabs/hardhat-ethers ethers@^5.0.0 @thirdweb-dev/contracts && npx hardhat run scripts/deploy.js --network mumbai"]
+run = ["sh", "-c", "npx hardhat run scripts/deploy.js --network mumbai"]
+build = ["sh", "-c", "npm install --save-dev hardhat @nomiclabs/hardhat-ethers ethers@^5.0.0 @thirdweb-dev/contracts"]
 
 [[ports]]
 localPort = 5000
