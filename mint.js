@@ -8,7 +8,7 @@ async function main() {
   const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
 
   const contractAddress = "0x15AD65Fb62CD9147Aa4443dA89828A693228b5F7"; // SWF Token
-  const recipient = "YOUR_RECIPIENT_ADDRESS_HERE"; // Replace with your actual wallet
+  const recipient = "0x26A8401287cE33CC4aeb5a106cd6D282a92Cf51d"; // Treasury wallet
   const amount = ethers.utils.parseUnits("1000000", 18); // 1,000,000 SWF
 
   const abi = [
