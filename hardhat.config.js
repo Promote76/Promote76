@@ -1,5 +1,7 @@
 // Import required plugins
 require("@nomiclabs/hardhat-ethers");
+require("@nomiclabs/hardhat-etherscan");
+require("dotenv").config();
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
@@ -16,6 +18,14 @@ module.exports = {
       chainId: 80001, // Mumbai chain ID
       // Get the private key from environment variables for security
       accounts: [process.env.PRIVATE_KEY || "0x0000000000000000000000000000000000000000000000000000000000000000"],
+      timeout: 60000, // Increase timeout to 60 seconds
+      gasMultiplier: 1.5 // Increase gas by 50% to avoid underpriced transactions
+    },
+    // Polygon Amoy testnet configuration
+    amoy: {
+      url: "https://rpc-amoy.polygon.technology", // Amoy RPC endpoint
+      chainId: 80002, // Amoy chain ID
+      accounts: [process.env.PRIVATE_KEY], // Private key from .env file
       timeout: 60000, // Increase timeout to 60 seconds
       gasMultiplier: 1.5 // Increase gas by 50% to avoid underpriced transactions
     },
@@ -38,5 +48,24 @@ module.exports = {
       enabled: true,
       runs: 200
     }
+  },
+  
+  // Etherscan verification configuration
+  etherscan: {
+    apiKey: {
+      // For Polygon networks (Mumbai and Amoy)
+      polygonMumbai: process.env.POLYGONSCAN_API_KEY,
+      amoy: process.env.POLYGONSCAN_API_KEY
+    },
+    customChains: [
+      {
+        network: "amoy",
+        chainId: 80002,
+        urls: {
+          apiURL: "https://api-amoy.polygonscan.com/api",
+          browserURL: "https://amoy.polygonscan.com/"
+        }
+      }
+    ]
   }
 };

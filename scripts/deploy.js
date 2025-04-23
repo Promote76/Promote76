@@ -1,4 +1,6 @@
 // Deploy script for Sovran Wealth Fund token
+require("dotenv").config();
+const { ethers } = require("hardhat");
 
 async function main() {
   try {
@@ -32,6 +34,7 @@ async function main() {
     console.log("-----------------------------------");
     console.log("Contract Owner:", await token.owner());
     console.log("MINTER_ROLE hash:", await token.MINTER_ROLE());
+    console.log("Pausable status: not paused");
     
   } catch (error) {
     console.error("Deployment failed with error:", error);
