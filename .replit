@@ -50,7 +50,7 @@ args = "Ultra Minimal Dashboard"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Static HTML Dashboard"
+args = "Absolute Final Dashboard"
 
 [[workflows.workflow]]
 name = "check_dependencies"
@@ -187,7 +187,7 @@ args = "node ultra-minimal.js"
 waitForPort = 5000
 
 [[workflows.workflow]]
-name = "Static HTML Dashboard"
+name = "Absolute Final Dashboard"
 author = "agent"
 
 [workflows.workflow.metadata]
@@ -198,7 +198,7 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "node static-html-server.js"
+args = "node absolute-final.js"
 waitForPort = 5000
 
 [deployment]
