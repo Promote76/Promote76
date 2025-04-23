@@ -12,7 +12,9 @@ module.exports = {
       timeout: 1200000 // 20 minutes
     },
     mumbai: {
-      url: `https://polygon-mumbai.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
+      url: process.env.ALCHEMY_API_KEY 
+        ? `https://polygon-mumbai.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`
+        : "https://polygon-mumbai-bor.publicnode.com", // Public fallback RPC
       accounts: [process.env.PRIVATE_KEY],
       gasPrice: 35000000000, // 35 gwei
       timeout: 1200000 // 20 minutes
