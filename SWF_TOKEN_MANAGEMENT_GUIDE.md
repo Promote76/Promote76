@@ -1,156 +1,232 @@
-# Sovran Wealth Fund (SWF) Token Management Guide
+# Sovran Wealth Fund - Token Management Guide
 
-This comprehensive guide explains how to manage your Sovran Wealth Fund (SWF) token on the Polygon mainnet. The token features role-based minting, pausable transactions, and token burning capabilities.
+This guide details how to manage and interact with the SovranWealthFund (SWF) token, including its special features and administrative functions.
+
+## Token Overview
+
+The SovranWealthFund token is an ERC20 token deployed on the Polygon blockchain with the following enhanced features:
+
+1. **Role-Based Access Control**: Permission system for minting and administrative functions
+2. **Pausable Functionality**: Ability to pause token transfers during emergencies
+3. **Burnable Capability**: Token holders can burn their tokens
+4. **Metadata Support**: Token links to IPFS-hosted metadata for complete information
 
 ## Token Details
 
 - **Name**: Sovran Wealth Fund
-- **Symbol**: SWF  
+- **Symbol**: SWF
 - **Decimals**: 18
-- **Contract Address**: `0x15AD65Fb62CD9147Aa4443dA89828A693228b5F7`
-- **Network**: Polygon Mainnet
-- **Block Explorer**: [View on Polygonscan](https://polygonscan.com/address/0x15AD65Fb62CD9147Aa4443dA89828A693228b5F7)
+- **Contract Address**: 0x15AD65Fb62CD9147Aa4443dA89828A693228b5F7 (Polygon Mainnet)
+- **IPFS Metadata**: ipfs://bafybeieum7kw52qswf4tmnxzaejsmm3orecgq2oewh6mu6y4u7imzrjwy
 
-## Prerequisites
+## CLI Token Manager
 
-Before using the management tools, ensure you have:
+The project includes a comprehensive CLI tool (`swf-token-manager.js`) for interacting with the token:
 
-1. Node.js and npm installed
-2. Access to your wallet private key (stored in .env file)
-3. MATIC tokens for gas fees on Polygon mainnet
+### View Token Information
 
-## Token Management Tools
+Get details about the token and your balance:
 
-### 1. Basic Usage: swf-token-manager.js
-
-This script provides comprehensive management of your SWF token, including:
-
-- Viewing token information
-- Checking balances
-- Minting new tokens
-- Pausing/unpausing token transfers
-- Managing minter roles
-
-#### Commands:
-
-**View Token Information**
 ```
 node swf-token-manager.js info
 ```
 
-**Check Token Balance**
-```
-node swf-token-manager.js balance <wallet-address>
-```
+This displays:
+- Token name, symbol, and total supply
+- Your connected wallet address and balance
+- Current token state (paused/unpaused)
+- Roles information (who has minting permissions)
 
-**Mint Tokens**
-```
-node swf-token-manager.js mint <recipient-address> <amount>
-```
-Example: `node swf-token-manager.js mint 0x26A8401287cE33CC4aeb5a106cd6D282a92Cf51d 1000`
+### Check Any Address Balance
 
-**Toggle Pause State**
-```
-node swf-token-manager.js pause
-```
-
-**Grant Minter Role**
-```
-node swf-token-manager.js grant-minter <wallet-address>
-```
-
-**Revoke Minter Role**
-```
-node swf-token-manager.js revoke-minter <wallet-address>
-```
-
-### 2. Simple Minting: mint.js
-
-For quick token minting, you can use the simplified mint.js script:
+Check the token balance of any address:
 
 ```
-node mint.js <recipient-address> <amount>
+node swf-token-manager.js balance 0xYourAddressHere
 ```
 
-Example: `node mint.js 0x26A8401287cE33CC4aeb5a106cd6D282a92Cf51d 500`
+### Mint Tokens (Admin Only)
+
+If you have the MINTER_ROLE, you can mint new tokens:
+
+```
+node swf-token-manager.js mint 0xRecipientAddress 100
+```
+
+This mints 100 SWF tokens to the specified address.
+
+### Toggle Pause State (Admin Only)
+
+If you are the contract admin, you can pause/unpause all token transfers:
+
+```
+node swf-token-manager.js toggle-pause
+```
+
+This function is designed for emergency situations where token transfers need to be temporarily halted.
+
+### Grant Minter Role (Admin Only)
+
+Grant minting permissions to a new address:
+
+```
+node swf-token-manager.js grant-minter 0xNewMinterAddress
+```
+
+This allows the specified address to mint new tokens.
+
+### Revoke Minter Role (Admin Only)
+
+Remove minting permissions from an address:
+
+```
+node swf-token-manager.js revoke-minter 0xMinterAddress
+```
 
 ## Token Features Explained
 
 ### Role-Based Access Control
 
-The SWF token implements a role-based permission system for minting:
+The token uses OpenZeppelin's PermissionsEnumerable for granular access control:
 
-- **DEFAULT_ADMIN_ROLE**: Has authority to grant and revoke all other roles
-- **MINTER_ROLE**: Can mint new tokens to any address
+1. **DEFAULT_ADMIN_ROLE**: Can grant and revoke all other roles
+2. **MINTER_ROLE**: Can mint new tokens
+3. **PAUSER_ROLE**: Can pause and unpause token transfers
 
-By default, the deployer wallet has both roles. Additional addresses can be granted the MINTER_ROLE using the `grant-minter` command.
+The deployer address automatically receives all roles, and typically shares admin rights with a Treasury address.
 
-### Pausable Transfers
+### Pausable Mechanism
 
-The token includes a pause mechanism that can temporarily halt all transfers. This feature is controlled by the owner and can be useful in case of:
+The token implements OpenZeppelin's Pausable module:
 
-- Security incidents
-- Contract upgrades
-- Regulatory compliance
+- When paused, all transfers are blocked
+- Only accounts with PAUSER_ROLE can pause/unpause
+- Pausing doesn't affect approvals or balance viewing
+- Intended for emergency situations only
 
-Use the `pause` command to toggle this state (pause if running, unpause if paused).
+### Burning Capability
 
-### Token Burning
+Any token holder can burn their own tokens:
 
-SWF allows token holders to burn their own tokens, permanently removing them from circulation. This is handled directly by the contract.
+```javascript
+// Example code for burning tokens
+await swfToken.burn(ethers.utils.parseEther("10"));
+```
 
-## Gas Price Management
+Once tokens are burned, they are permanently removed from circulation and cannot be recovered.
 
-The management scripts automatically calculate optimal gas prices for Polygon mainnet:
-- Uses the current network gas price and applies a 1.5x multiplier
-- Ensures a minimum of 30 gwei to prevent transaction failures
-- Sets appropriate gas limits for each transaction type
+## Integration with IPFS Metadata
 
-## IPFS Metadata
+The token metadata is stored on IPFS for decentralized access:
 
-The token metadata is available in the `exports` directory:
+- **IPFS CID**: bafybeieum7kw52qswf4tmnxzaejsmm3orecgq2oewh6mu6y4u7imzrjwy
+- **Gateway URL**: https://bafybeieum7kw52qswf4tmnxzaejsmm3orecgq2oewh6mu6y4u7imzrjwy.ipfs.storacha.network
 
-- **JSON File**: Contains the token's full metadata in JSON format
-- **HTML File**: A human-readable representation of the token data
-- **Upload Guide**: Instructions for uploading to decentralized storage
+The metadata includes:
+- Basic token information (name, symbol, description)
+- Contract details and network information
+- Attributes including staking parameters
+- Information about the modular system components
+- Links to relevant resources
 
-To upload this metadata to IPFS, follow the guide in `exports/UPLOAD_GUIDE.md`.
+## Programming with the Token
+
+### Using ethers.js
+
+```javascript
+const { ethers } = require("ethers");
+const tokenABI = require("./abis/SovranWealthFund.json");
+
+// Connect to provider
+const provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
+const wallet = new ethers.Wallet("PRIVATE_KEY", provider);
+
+// Initialize contract instance
+const tokenAddress = "0x15AD65Fb62CD9147Aa4443dA89828A693228b5F7";
+const swfToken = new ethers.Contract(tokenAddress, tokenABI, wallet);
+
+// Get token information
+const name = await swfToken.name();
+const symbol = await swfToken.symbol();
+const totalSupply = await swfToken.totalSupply();
+const decimals = await swfToken.decimals();
+const balance = await swfToken.balanceOf(wallet.address);
+
+console.log(`${name} (${symbol})`);
+console.log(`Total Supply: ${ethers.utils.formatEther(totalSupply)} ${symbol}`);
+console.log(`Your Balance: ${ethers.utils.formatEther(balance)} ${symbol}`);
+
+// Transfer tokens
+const recipient = "0xRecipientAddressHere";
+const amount = ethers.utils.parseEther("10"); // 10 SWF
+await swfToken.transfer(recipient, amount);
+
+// Check allowances
+const spender = "0xSpenderAddressHere";
+const allowance = await swfToken.allowance(wallet.address, spender);
+console.log(`Allowance for ${spender}: ${ethers.utils.formatEther(allowance)} SWF`);
+
+// Approve spending
+await swfToken.approve(spender, ethers.utils.parseEther("50"));
+
+// Check role information (admin only)
+const MINTER_ROLE = await swfToken.MINTER_ROLE();
+const hasMinterRole = await swfToken.hasRole(MINTER_ROLE, wallet.address);
+console.log(`Has minter role: ${hasMinterRole}`);
+```
+
+### Events to Monitor
+
+The token contract emits standard ERC20 events plus role management events:
+
+- **Transfer**: When tokens are transferred between addresses
+- **Approval**: When spending allowance is granted
+- **RoleGranted**: When a role is assigned to an address
+- **RoleRevoked**: When a role is removed from an address
+- **Paused**: When the token is paused
+- **Unpaused**: When the token is unpaused
+
+## Security Considerations
+
+1. **Private Keys**: Never share your private key or expose it in code
+2. **Role Management**: Be extremely careful when granting roles, especially admin rights
+3. **Gas Fees**: Ensure you have enough MATIC for gas (recommended 37.5+ gwei for Polygon)
+4. **Pausable Impact**: Pausing the token affects ALL transfers, use only in emergencies
+5. **Burning is Permanent**: Burned tokens cannot be recovered
+
+## Integration with the Modular System
+
+The SWF token serves as the foundation for the entire modular system:
+
+1. **Staking Component**: SoloMethodEngineV2 requires MINTER_ROLE to distribute staking rewards
+2. **BasketIndex**: Can include SWF as one of its underlying assets
+3. **RoleRouter**: Distributes SWF tokens according to predefined allocations
+4. **ModularEngine**: Acts as the central integration point for token-related functions
+
+Most users will interact with the token through these modular components rather than directly with the token contract.
+
+## Mainnet Deployment Information
+
+The SWF token was deployed to Polygon Mainnet with the following details:
+
+- **Transaction Hash**: 0x0ac75e83b1ddb5261c96d6bf73deded44fe069b96bfec13a0a34ea1c84fcbf73
+- **Block Number**: 51289374
+- **Deployer Address**: 0xCe36333A88c2EA01f28f63131fA7dfa80AD021F6
+- **Contract Address**: 0x15AD65Fb62CD9147Aa4443dA89828A693228b5F7
+- **Initial Treasury**: 0x26A8401287cE33CC4aeb5a106cd6D282a9C2f51d
 
 ## Troubleshooting
 
-### Transaction Failures
+If you encounter issues with the token:
 
-If transactions fail, check:
+1. **Failed Transfers**: Check if the token is paused or if you have sufficient balance
+2. **Minting Problems**: Verify you have the MINTER_ROLE
+3. **Role Management**: Only admin can grant/revoke roles
+4. **Gas Issues**: Increase gas price to at least 37.5 gwei for Polygon mainnet
+5. **Contract Verification**: The contract is verified on Polygonscan for transparency
 
-1. **Gas Price**: Polygon mainnet can sometimes require higher gas prices during congestion
-2. **MATIC Balance**: Ensure your wallet has sufficient MATIC for gas fees
-3. **Nonce Issues**: If you have pending transactions, they might need to complete first
+## Conclusion
 
-### Permission Errors
+The SovranWealthFund token combines standard ERC20 functionality with advanced features for security and flexibility. Through the role-based permission system, it enables a sophisticated ecosystem centered around the modular components while maintaining strong access controls.
 
-If you encounter "missing role" errors:
-
-1. Check that your wallet address has the required role using:
-   ```
-   node swf-token-manager.js info
-   ```
-2. Request the role from the contract admin if needed
-
-## Security Best Practices
-
-1. **Private Key Safety**: Never share your private key or .env file
-2. **Limited Minting Rights**: Only grant MINTER_ROLE to trusted addresses
-3. **Regular Audits**: Periodically check token balances and transaction history
-4. **Backup**: Keep secure backups of your wallet private keys
-
-## Further Development
-
-For advanced contract interactions, you can explore the scripts in the `scripts` directory, including:
-
-- Airdrop functionality
-- Balance checking
-- Complete test suites
-
----
-
-For any questions or support, please reach out to the project administrators.
+For questions or additional assistance, refer to the official documentation or contact the development team.

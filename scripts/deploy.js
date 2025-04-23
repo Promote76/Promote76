@@ -10,8 +10,8 @@ async function main() {
     console.log("Deploying contracts with the account:", deployer.address);
     console.log("Account balance:", (await deployer.getBalance()).toString());
 
-    // Get the contract factory
-    const SovranWealthFund = await ethers.getContractFactory("SovranWealthFund");
+    // Get the contract factory with fully qualified name to resolve ambiguity
+    const SovranWealthFund = await ethers.getContractFactory("contracts/SovranWealthFund.sol:SovranWealthFund");
     
     // Deploy the contract with optimized gas settings
     console.log("Deploying SovranWealthFund with optimized gas...");

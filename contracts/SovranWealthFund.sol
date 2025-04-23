@@ -25,9 +25,8 @@ contract SovranWealthFund is ERC20Base, PermissionsEnumerable {
     constructor()
         ERC20Base(msg.sender, "Sovran Wealth Fund", "SWF")
     {
-        // Grant the MINTER_ROLE to the contract owner (msg.sender) and the Treasury address
+        // Grant the MINTER_ROLE to the contract owner only (msg.sender)
         _setupRole(MINTER_ROLE, msg.sender);
-        _setupRole(MINTER_ROLE, 0x26A8401287cE33CC4aeb5a106cd6D282a92Cf51d); // Treasury wallet
         _paused = false;
     }
     

@@ -15,11 +15,19 @@ async function main() {
     let swfToken;
     if (process.env.SWF_CONTRACT_ADDRESS) {
       console.log(`Using existing SWF token at ${process.env.SWF_CONTRACT_ADDRESS}`);
-      const SovranWealthFund = await ethers.getContractFactory("SovranWealthFund");
+      const SovranWealthFund = await ethers.getContractFactory("SovranWealthFund", {
+        libraries: {},
+        contractName: "SovranWealthFund",
+        sourceName: "contracts/SovranWealthFund.sol"
+      });
       swfToken = await SovranWealthFund.attach(process.env.SWF_CONTRACT_ADDRESS);
     } else {
       console.log("Deploying SovranWealthFund token...");
-      const SovranWealthFund = await ethers.getContractFactory("SovranWealthFund");
+      const SovranWealthFund = await ethers.getContractFactory("SovranWealthFund", {
+        libraries: {},
+        contractName: "SovranWealthFund",
+        sourceName: "contracts/SovranWealthFund.sol"
+      });
       swfToken = await SovranWealthFund.deploy();
       await swfToken.deployed();
       console.log(`SWF token deployed to: ${swfToken.address}`);

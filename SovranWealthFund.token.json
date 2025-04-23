@@ -1,7 +1,7 @@
 {
   "name": "Sovran Wealth Fund",
   "symbol": "SWF",
-  "description": "A comprehensive ERC20 token on Polygon blockchain with advanced smart contract capabilities, including role-based minting, pausable transactions, and token burning.",
+  "description": "A comprehensive ERC20 token on Polygon blockchain with advanced smart contract capabilities, including role-based minting, pausable transactions, and token burning. Features a modular system with dynamic APR staking and a basket index for asset diversification.",
   "image": "https://i.imgur.com/wXbKQCH.png",
   "decimals": 18,
   "contractAddress": "0x15AD65Fb62CD9147Aa4443dA89828A693228b5F7",
@@ -28,11 +28,39 @@
     {
       "trait_type": "Compliance",
       "value": "OpenZeppelin standards"
+    },
+    {
+      "trait_type": "Staking",
+      "value": "SoloMethodEngine (25% APR)"
+    },
+    {
+      "trait_type": "Architecture",
+      "value": "Modular System"
     }
   ],
+  "staking": {
+    "engine": "SoloMethodEngineV2",
+    "apr": "25%",
+    "minStake": "50 SWF",
+    "walletCount": 16,
+    "walletRoles": ["BUYER", "HOLDER", "STAKER", "LIQUIDITY", "TRACKER"]
+  },
+  "modularSystem": {
+    "components": [
+      "BasketIndex",
+      "RoleRouter",
+      "SoloMethodEngineV2",
+      "SWFModularEngine"
+    ],
+    "basketAssets": {
+      "description": "Supports multiple underlying assets with configurable weights"
+    }
+  },
   "links": {
     "etherscan": "https://polygonscan.com/address/0x15AD65Fb62CD9147Aa4443dA89828A693228b5F7",
-    "github": ""
+    "github": "",
+    "ipfs": "ipfs://bafybeieum7kw52qswf4tmnxzaejsmm3orecgq2oewh6mu6y4u7imzrjwy",
+    "storacha": "https://bafybeieum7kw52qswf4tmnxzaejsmm3orecgq2oewh6mu6y4u7imzrjwy.ipfs.storacha.network"
   },
-  "timestamp": "2025-04-23T07:52:32.879Z"
+  "timestamp": "2025-04-23T08:48:32.879Z"
 }

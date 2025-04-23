@@ -6,8 +6,14 @@ module.exports = {
   solidity: "0.8.20",
   networks: {
     polygon: {
-      url: "https://polygon-rpc.com",
-      accounts: [process.env.PRIVATE_KEY]
+      url: `https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
+      accounts: [process.env.PRIVATE_KEY],
+      gasPrice: 35000000000, // 35 gwei
+      timeout: 1200000 // 20 minutes
+    },
+    localhost: {
+      url: "http://127.0.0.1:8545",
+      timeout: 300000
     }
   },
   etherscan: {

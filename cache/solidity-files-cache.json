@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/home/runner/workspace/contracts/SovranWealthFund.sol": {
-      "lastModificationDate": 1745380942370,
-      "contentHash": "0f9d22650212dbd5fbf6f27ef109e59a",
+      "lastModificationDate": 1745400347589,
+      "contentHash": "3817480c4633f2796e6493a10f6e6b9a",
       "sourceName": "contracts/SovranWealthFund.sol",
       "solcConfig": {
         "version": "0.8.20",
@@ -941,8 +941,8 @@
       ]
     },
     "/home/runner/workspace/contracts/SovranWealthFundMinimal.sol": {
-      "lastModificationDate": 1745387367748,
-      "contentHash": "09dd740d285f66766fe17fec9d1f1dd4",
+      "lastModificationDate": 1745400463824,
+      "contentHash": "1aadf89cc3db5f7a8691ffdf6e69db03",
       "sourceName": "contracts/SovranWealthFundMinimal.sol",
       "solcConfig": {
         "version": "0.8.20",
@@ -1245,6 +1245,399 @@
       "artifacts": [
         "SoloMethodEngine",
         "SovranWealthFund"
+      ]
+    },
+    "/home/runner/workspace/contracts/BasketIndex.sol": {
+      "lastModificationDate": 1745398951550,
+      "contentHash": "ccf29a4056f73001141da0dd3e82e9f1",
+      "sourceName": "contracts/BasketIndex.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "@openzeppelin/contracts/access/Ownable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "BasketIndex"
+      ]
+    },
+    "/home/runner/workspace/contracts/SWFModularEngine.sol": {
+      "lastModificationDate": 1745399051533,
+      "contentHash": "5a830e64c36b0c8dd7a0bd504f452cba",
+      "sourceName": "contracts/SWFModularEngine.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/access/Ownable.sol",
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "./BasketIndex.sol",
+        "./RoleRouter.sol",
+        "./SoloMethodEngineV2.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "SWFModularEngine"
+      ]
+    },
+    "/home/runner/workspace/contracts/RoleRouter.sol": {
+      "lastModificationDate": 1745398977885,
+      "contentHash": "43dbfb0a27a520cb7f5e300bd8dd4f56",
+      "sourceName": "contracts/RoleRouter.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "@openzeppelin/contracts/access/Ownable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "RoleRouter"
+      ]
+    },
+    "/home/runner/workspace/contracts/SoloMethodEngineV2.sol": {
+      "lastModificationDate": 1745400111465,
+      "contentHash": "80975624b92a29c297db335012927856",
+      "sourceName": "contracts/SoloMethodEngineV2.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "@openzeppelin/contracts/access/Ownable.sol",
+        "./interfaces/ISovranWealthFund.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "SoloMethodEngineV2"
+      ]
+    },
+    "/home/runner/workspace/contracts/interfaces/ISovranWealthFund.sol": {
+      "lastModificationDate": 1745400058485,
+      "contentHash": "e50ba6929d5de26d6934a4861e309924",
+      "sourceName": "contracts/interfaces/ISovranWealthFund.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "ISovranWealthFund",
+        "SovranWealthFund"
+      ]
+    },
+    "/home/runner/workspace/contracts/SWFIntegratedEngine.sol": {
+      "lastModificationDate": 1745400310149,
+      "contentHash": "e95472c9899207e38473aa7079064531",
+      "sourceName": "contracts/SWFIntegratedEngine.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "./interfaces/ISovranWealthFund.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "SWFIntegratedEngine"
+      ]
+    },
+    "/home/runner/workspace/contracts/SWFSovereignEngine.sol": {
+      "lastModificationDate": 1745400329015,
+      "contentHash": "70c17950aef6179dfc60ff34d2d9df2e",
+      "sourceName": "contracts/SWFSovereignEngine.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "SWFSovereignEngine"
+      ]
+    },
+    "/home/runner/workspace/contracts/SWFBasketVault.sol": {
+      "lastModificationDate": 1745406365296,
+      "contentHash": "5347755f07dcd632890fcd70ed433aa4",
+      "sourceName": "contracts/SWFBasketVault.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "@openzeppelin/contracts/token/ERC20/ERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "SWFBasketVault"
+      ]
+    },
+    "/home/runner/workspace/contracts/DynamicAPRController.sol": {
+      "lastModificationDate": 1745406654176,
+      "contentHash": "9bd62f9ee9d53b7394a0b0592f75f671",
+      "sourceName": "contracts/DynamicAPRController.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/access/Ownable.sol",
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "./SWFBasketVault.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "DynamicAPRController"
+      ]
+    },
+    "/home/runner/workspace/contracts/SoloMethodEngine.sol": {
+      "lastModificationDate": 1745406774280,
+      "contentHash": "9a103748936e11963186043919787c7f",
+      "sourceName": "contracts/SoloMethodEngine.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "@openzeppelin/contracts/access/Ownable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "SoloMethodEngine"
       ]
     }
   }
