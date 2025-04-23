@@ -53,21 +53,40 @@ async function safeApiRequest(endpoint) {
     console.log(`Fetching ${endpoint}...`);
     const response = await axios.get(`${API_SERVER_URL}/${endpoint}`);
     
-    // Verify we got a proper response with data
+    // Verify we got a proper response
     if (response.status !== 200) {
       console.warn(`Non-200 status code (${response.status}) for ${endpoint}`);
       return [];
     }
     
-    // Check if response data exists and is valid
-    if (!response.data) {
-      console.warn(`Empty response data for ${endpoint}`);
+    // Use the safer text-based approach first
+    const responseText = JSON.stringify(response.data);
+    let data;
+    
+    try {
+      // Parse the text safely
+      data = responseText ? JSON.parse(responseText) : {};
+      
+      // Extra validation
+      if (!data) {
+        console.warn(`Empty parsed data for ${endpoint}`);
+        return [];
+      }
+      
+      return data;
+    } catch (parseError) {
+      console.error(`Failed to parse JSON for ${endpoint}:`, parseError.message);
+      console.error(`Raw response:`, responseText.substring(0, 100) + '...');
       return [];
     }
-    
-    return response.data;
   } catch (error) {
     console.error(`Error fetching ${endpoint}:`, error.message);
+    if (error.response) {
+      console.error(`Status: ${error.response.status}`);
+      if (error.response.data) {
+        console.error(`Response data:`, error.response.data);
+      }
+    }
     // Return empty array as fallback
     return [];
   }

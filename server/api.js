@@ -23,9 +23,29 @@ const PORT = process.env.PORT || 5001;
 app.use(cors({
   origin: '*', // Allow all origins for demonstration
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['Content-Type', 'Content-Length']
 }));
 app.use(express.json());
+
+// Add global content-type middleware to ensure all responses have proper headers
+app.use((req, res, next) => {
+  // Set content type for all API responses
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  next();
+});
+
+// Add global error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Global error handler caught:', err);
+  if (!res.headersSent) {
+    res.status(500).json({ 
+      error: 'Internal server error', 
+      message: err.message || 'Unknown error'
+    });
+  }
+  next(err);
+});
 
 // API routes
 

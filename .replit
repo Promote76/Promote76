@@ -38,7 +38,15 @@ args = "Static HTML Dashboard"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Robust Dashboard"
+args = "Simple Static Dashboard"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Pure Static Dashboard"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Frontend Dashboard"
 
 [[workflows.workflow]]
 name = "check_dependencies"
@@ -130,7 +138,7 @@ args = "node static-html-server.js"
 waitForPort = 5000
 
 [[workflows.workflow]]
-name = "Robust Dashboard"
+name = "Simple Static Dashboard"
 author = "agent"
 
 [workflows.workflow.metadata]
@@ -141,7 +149,37 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "node robust-dashboard.js"
+args = "node simple-static-server.js"
+waitForPort = 5000
+
+[[workflows.workflow]]
+name = "Pure Static Dashboard"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node pure-static-server.js"
+waitForPort = 5000
+
+[[workflows.workflow]]
+name = "Frontend Dashboard"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node frontend-server.js"
 waitForPort = 5000
 
 [deployment]
