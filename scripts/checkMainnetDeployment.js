@@ -1,74 +1,71 @@
-// Script for checking the status of mainnet deployment transactions
+// Script to check SovranWealthFund token deployment status on Polygon mainnet
 require("dotenv").config();
 const { ethers } = require("hardhat");
 
-// Add your transaction hash here
-const TX_HASH = "0x0ac75e83b1ddb5261c96d6bf73deded44fe069b96bfec13a0a34ea1c84fcbf73";
+// Contract address from deployment
+const TOKEN_ADDRESS = "0x15AD65Fb62CD9147Aa4443dA89828A693228b5F7";
 
 async function main() {
   try {
     console.log("-".repeat(50));
-    console.log("CHECKING POLYGON MAINNET DEPLOYMENT");
+    console.log("CHECKING SWF TOKEN ON POLYGON MAINNET");
     console.log("-".repeat(50));
     
-    const provider = new ethers.providers.JsonRpcProvider(
-      process.env.ALCHEMY_API_KEY 
-      ? `https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`
-      : "https://polygon-rpc.com"
-    );
+    // Create a provider using Alchemy API
+    const alchemyApiKey = process.env.ALCHEMY_API_KEY;
+    const provider = new ethers.providers.AlchemyProvider("matic", alchemyApiKey);
     
-    console.log(`Checking transaction: ${TX_HASH}`);
+    // Get contract instance
+    const SovranWealthFund = await ethers.getContractAt("SovranWealthFund", TOKEN_ADDRESS, provider);
     
-    // Get transaction receipt
-    const receipt = await provider.getTransactionReceipt(TX_HASH);
+    // Get basic token information
+    const name = await SovranWealthFund.name();
+    const symbol = await SovranWealthFund.symbol();
+    const decimals = await SovranWealthFund.decimals();
+    const totalSupply = await SovranWealthFund.totalSupply();
     
-    if (!receipt) {
-      console.log("Transaction is still pending. Please wait for confirmation.");
-      return;
+    console.log(`Token Name: ${name}`);
+    console.log(`Token Symbol: ${symbol}`);
+    console.log(`Decimals: ${decimals}`);
+    console.log(`Total Supply: ${ethers.utils.formatEther(totalSupply)} ${symbol}`);
+    
+    // Check if token is paused
+    const paused = await SovranWealthFund.paused();
+    console.log(`Token Transfers Paused: ${paused ? "Yes" : "No"}`);
+    
+    // Get contract owner
+    const owner = await SovranWealthFund.owner();
+    console.log(`Contract Owner: ${owner}`);
+    
+    // Get default admin role (for role-based access control)
+    const DEFAULT_ADMIN_ROLE = ethers.constants.HashZero;
+    const MINTER_ROLE = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("MINTER_ROLE"));
+    
+    // Check minter role for owner and treasury
+    const ownerHasMinterRole = await SovranWealthFund.hasRole(MINTER_ROLE, owner);
+    console.log(`Owner has minter role: ${ownerHasMinterRole ? "Yes" : "No"}`);
+    
+    // Check TREASURY address from our .env file (if available)
+    if (process.env.TREASURY_ADDRESS) {
+      const treasuryAddress = process.env.TREASURY_ADDRESS;
+      const treasuryHasMinterRole = await SovranWealthFund.hasRole(MINTER_ROLE, treasuryAddress);
+      console.log(`Treasury (${treasuryAddress}) has minter role: ${treasuryHasMinterRole ? "Yes" : "No"}`);
     }
     
-    console.log("Transaction Status:", receipt.status === 1 ? "SUCCESS ✅" : "FAILED ❌");
-    console.log("Block Number:", receipt.blockNumber);
-    console.log("Gas Used:", receipt.gasUsed.toString());
+    console.log("\n✅ TOKEN DEPLOYMENT VERIFIED!");
+    console.log(`Contract is accessible and operational on Polygon mainnet.`);
+    console.log(`Polygonscan: https://polygonscan.com/token/${TOKEN_ADDRESS}`);
     
-    if (receipt.status === 1) {
-      // Get contract address from receipt
-      const contractAddress = receipt.contractAddress;
-      console.log("\nContract Address:", contractAddress);
-      
-      // Display contract info URL
-      console.log(`\nView your contract on Polygonscan:`);
-      console.log(`https://polygonscan.com/address/${contractAddress}`);
-      
-      // Save contract information to file
-      const fs = require("fs");
-      fs.writeFileSync(
-        "mainnet-contract-info.json", 
-        JSON.stringify({
-          network: "Polygon Mainnet",
-          contractType: "SovranWealthFund (Full)",
-          contractAddress: contractAddress,
-          deploymentTxHash: TX_HASH,
-          blockNumber: receipt.blockNumber,
-          gasUsed: receipt.gasUsed.toString(),
-          deployedAt: new Date().toISOString()
-        }, null, 2)
-      );
-      
-      console.log("\nContract information saved to mainnet-contract-info.json");
-      
-      // Verification instructions
-      console.log("\nTo verify your contract on Polygonscan, run:");
-      console.log(`npx hardhat verify --network polygon ${contractAddress}`);
-    }
   } catch (error) {
-    console.error("Error checking transaction:", error.message);
+    console.error("\n❌ VERIFICATION FAILED!");
+    console.error("Error:", error.message);
+    process.exitCode = 1;
   }
 }
 
 main()
   .then(() => process.exit(0))
   .catch(error => {
-    console.error("Unhandled error:", error);
+    console.error("\nUnhandled error:", error);
     process.exit(1);
   });
