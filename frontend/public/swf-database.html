@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SWF Database Dashboard</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.6;
+      color: #fff;
+      background: linear-gradient(135deg, #2a0845 0%, #6441a5 100%);
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1, h2, h3 {
+      margin-top: 0;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .api-status {
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-size: 14px;
+      display: inline-block;
+    }
+    .api-status.connected {
+      background-color: rgba(39, 174, 96, 0.2);
+      color: #2ecc71;
+    }
+    .api-status.disconnected {
+      background-color: rgba(231, 76, 60, 0.2);
+      color: #e74c3c;
+    }
+    .card {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      text-align: left;
+      padding: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    th {
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+    tr:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s linear infinite;
+      margin-right: 10px;
+    }
+    .error-msg {
+      color: #e74c3c;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+    .tab-buttons {
+      display: flex;
+      margin-bottom: 20px;
+    }
+    .tab-button {
+      background-color: rgba(0, 0, 0, 0.2);
+      border: none;
+      color: #fff;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 4px;
+      margin-right: 5px;
+    }
+    .tab-button:hover {
+      background-color: rgba(0, 0, 0, 0.3);
+    }
+    .tab-button.active {
+      background-color: rgba(102, 51, 153, 0.6);
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Sovran Wealth Fund - Database Dashboard</h1>
+      <div id="apiStatus" class="api-status disconnected">Disconnected</div>
+    </header>
+
+    <div class="tab-buttons">
+      <button id="vaultsTab" class="tab-button active">Vaults</button>
+      <button id="rolesTab" class="tab-button">Role Allocations</button>
+      <button id="usersTab" class="tab-button">Users</button>
+    </div>
+
+    <!-- Vaults Section -->
+    <div id="vaultsContent" class="tab-content active">
+      <div class="card">
+        <h2>SWF Vaults</h2>
+        <div id="vaultsLoading">
+          <span class="loading"></span> Loading vault data...
+        </div>
+        <div id="vaultsError" class="error-msg" style="display: none;"></div>
+        <table id="vaultsTable" style="display: none;">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Current APR</th>
+              <th>Min/Max APR</th>
+              <th>Updated</th>
+            </tr>
+          </thead>
+          <tbody id="vaultsTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Roles Section -->
+    <div id="rolesContent" class="tab-content">
+      <div class="card">
+        <h2>Role Allocations</h2>
+        <div id="rolesLoading">
+          <span class="loading"></span> Loading role data...
+        </div>
+        <div id="rolesError" class="error-msg" style="display: none;"></div>
+        <table id="rolesTable" style="display: none;">
+          <thead>
+            <tr>
+              <th>Role</th>
+              <th>Percentage</th>
+              <th>Wallet Address</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody id="rolesTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Users Section -->
+    <div id="usersContent" class="tab-content">
+      <div class="card">
+        <h2>Users</h2>
+        <div id="usersLoading">
+          <span class="loading"></span> Loading user data...
+        </div>
+        <div id="usersError" class="error-msg" style="display: none;"></div>
+        <table id="usersTable" style="display: none;">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Address</th>
+              <th>Username</th>
+              <th>Role</th>
+              <th>Created</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Use consistent API base URL with error handling
+    const API_BASE_URL = `http://${window.location.hostname}:5001/api`;
+    
+    // Helper Functions
+    function formatDate(dateString) {
+      if (!dateString) return 'N/A';
+      const date = new Date(dateString);
+      return date.toLocaleString();
+    }
+    
+    function truncateAddress(address) {
+      if (!address) return 'N/A';
+      return address.substring(0, 6) + '...' + address.substring(address.length - 4);
+    }
+    
+    // API Connection Check
+    async function checkApiConnection() {
+      const statusElement = document.getElementById('apiStatus');
+      
+      try {
+        console.log('Checking API connection...');
+        const response = await fetch(`${API_BASE_URL}/health`);
+        const data = await response.json();
+        
+        if (data && data.status === 'OK') {
+          statusElement.textContent = 'Connected';
+          statusElement.classList.remove('disconnected');
+          statusElement.classList.add('connected');
+          console.log('API connected successfully');
+          return true;
+        } else {
+          throw new Error('API status not OK');
+        }
+      } catch (error) {
+        console.error('API connection error:', error);
+        statusElement.textContent = 'Disconnected';
+        statusElement.classList.remove('connected');
+        statusElement.classList.add('disconnected');
+        return false;
+      }
+    }
+    
+    // Load Vaults Data
+    async function loadVaults() {
+      const loadingElement = document.getElementById('vaultsLoading');
+      const errorElement = document.getElementById('vaultsError');
+      const tableElement = document.getElementById('vaultsTable');
+      const tableBodyElement = document.getElementById('vaultsTableBody');
+      
+      // Show loading, hide error and table
+      loadingElement.style.display = 'block';
+      errorElement.style.display = 'none';
+      tableElement.style.display = 'none';
+      
+      try {
+        console.log('Fetching vaults data...');
+        const response = await fetch(`${API_BASE_URL}/vaults`);
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`);
+        }
+        
+        const vaults = await response.json();
+        console.log('Vaults data received:', vaults);
+        
+        // Clear existing rows
+        tableBodyElement.innerHTML = '';
+        
+        if (Array.isArray(vaults) && vaults.length > 0) {
+          vaults.forEach(vault => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${vault.id}</td>
+              <td>${vault.name || 'N/A'}</td>
+              <td>${vault.current_apr || 0}%</td>
+              <td>${vault.min_apr || 0}% - ${vault.max_apr || 0}%</td>
+              <td>${formatDate(vault.last_updated)}</td>
+            `;
+            tableBodyElement.appendChild(row);
+          });
+          
+          // Hide loading, show table
+          loadingElement.style.display = 'none';
+          tableElement.style.display = 'table';
+        } else {
+          // No vaults found
+          const row = document.createElement('tr');
+          row.innerHTML = '<td colspan="5" style="text-align: center;">No vaults found</td>';
+          tableBodyElement.appendChild(row);
+          
+          // Hide loading, show table
+          loadingElement.style.display = 'none';
+          tableElement.style.display = 'table';
+        }
+      } catch (error) {
+        console.error('Error loading vaults:', error);
+        
+        // Show error message
+        errorElement.textContent = `Error loading vaults: ${error.message}`;
+        errorElement.style.display = 'block';
+        loadingElement.style.display = 'none';
+      }
+    }
+    
+    // Load Roles Data
+    async function loadRoles() {
+      const loadingElement = document.getElementById('rolesLoading');
+      const errorElement = document.getElementById('rolesError');
+      const tableElement = document.getElementById('rolesTable');
+      const tableBodyElement = document.getElementById('rolesTableBody');
+      
+      // Show loading, hide error and table
+      loadingElement.style.display = 'block';
+      errorElement.style.display = 'none';
+      tableElement.style.display = 'none';
+      
+      try {
+        console.log('Fetching roles data...');
+        const response = await fetch(`${API_BASE_URL}/roles`);
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`);
+        }
+        
+        const roles = await response.json();
+        console.log('Roles data received:', roles);
+        
+        // Clear existing rows
+        tableBodyElement.innerHTML = '';
+        
+        if (Array.isArray(roles) && roles.length > 0) {
+          roles.forEach(role => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${role.role_name || 'N/A'}</td>
+              <td>${role.allocation_percentage || 0}%</td>
+              <td title="${role.wallet_address || ''}">${truncateAddress(role.wallet_address)}</td>
+              <td>${role.description || 'N/A'}</td>
+            `;
+            tableBodyElement.appendChild(row);
+          });
+          
+          // Hide loading, show table
+          loadingElement.style.display = 'none';
+          tableElement.style.display = 'table';
+        } else {
+          // No roles found
+          const row = document.createElement('tr');
+          row.innerHTML = '<td colspan="4" style="text-align: center;">No role allocations found</td>';
+          tableBodyElement.appendChild(row);
+          
+          // Hide loading, show table
+          loadingElement.style.display = 'none';
+          tableElement.style.display = 'table';
+        }
+      } catch (error) {
+        console.error('Error loading roles:', error);
+        
+        // Show error message
+        errorElement.textContent = `Error loading roles: ${error.message}`;
+        errorElement.style.display = 'block';
+        loadingElement.style.display = 'none';
+      }
+    }
+    
+    // Load Users Data - Just check the admin user
+    async function loadUsers() {
+      const loadingElement = document.getElementById('usersLoading');
+      const errorElement = document.getElementById('usersError');
+      const tableElement = document.getElementById('usersTable');
+      const tableBodyElement = document.getElementById('usersTableBody');
+      
+      // Show loading, hide error and table
+      loadingElement.style.display = 'block';
+      errorElement.style.display = 'none';
+      tableElement.style.display = 'none';
+      
+      try {
+        console.log('Fetching admin user data...');
+        // Known admin user
+        const adminAddress = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
+        const response = await fetch(`${API_BASE_URL}/users/${adminAddress}`);
+        
+        if (!response.ok) {
+          if (response.status === 404) {
+            // Not found is okay - we'll just show empty
+            const row = document.createElement('tr');
+            row.innerHTML = '<td colspan="5" style="text-align: center;">No users found</td>';
+            tableBodyElement.appendChild(row);
+            
+            // Hide loading, show table
+            loadingElement.style.display = 'none';
+            tableElement.style.display = 'table';
+            return;
+          }
+          throw new Error(`API error: ${response.status}`);
+        }
+        
+        const user = await response.json();
+        console.log('User data received:', user);
+        
+        // Clear existing rows
+        tableBodyElement.innerHTML = '';
+        
+        if (user && !user.error) {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${user.id || 'N/A'}</td>
+            <td title="${user.address || ''}">${truncateAddress(user.address)}</td>
+            <td>${user.username || 'N/A'}</td>
+            <td>${user.role || 'N/A'}</td>
+            <td>${formatDate(user.created_at)}</td>
+          `;
+          tableBodyElement.appendChild(row);
+          
+          // Hide loading, show table
+          loadingElement.style.display = 'none';
+          tableElement.style.display = 'table';
+        } else {
+          // No user found
+          const row = document.createElement('tr');
+          row.innerHTML = '<td colspan="5" style="text-align: center;">No users found</td>';
+          tableBodyElement.appendChild(row);
+          
+          // Hide loading, show table
+          loadingElement.style.display = 'none';
+          tableElement.style.display = 'table';
+        }
+      } catch (error) {
+        console.error('Error loading users:', error);
+        
+        // Show error message
+        errorElement.textContent = `Error loading users: ${error.message}`;
+        errorElement.style.display = 'block';
+        loadingElement.style.display = 'none';
+      }
+    }
+    
+    // Tab Switching
+    function setupTabs() {
+      const vaultsTabBtn = document.getElementById('vaultsTab');
+      const rolesTabBtn = document.getElementById('rolesTab');
+      const usersTabBtn = document.getElementById('usersTab');
+      
+      const vaultsContent = document.getElementById('vaultsContent');
+      const rolesContent = document.getElementById('rolesContent');
+      const usersContent = document.getElementById('usersContent');
+      
+      vaultsTabBtn.addEventListener('click', () => {
+        // Update active tab
+        vaultsTabBtn.classList.add('active');
+        rolesTabBtn.classList.remove('active');
+        usersTabBtn.classList.remove('active');
+        
+        // Show/hide content
+        vaultsContent.classList.add('active');
+        rolesContent.classList.remove('active');
+        usersContent.classList.remove('active');
+        
+        // Load data
+        loadVaults();
+      });
+      
+      rolesTabBtn.addEventListener('click', () => {
+        // Update active tab
+        vaultsTabBtn.classList.remove('active');
+        rolesTabBtn.classList.add('active');
+        usersTabBtn.classList.remove('active');
+        
+        // Show/hide content
+        vaultsContent.classList.remove('active');
+        rolesContent.classList.add('active');
+        usersContent.classList.remove('active');
+        
+        // Load data
+        loadRoles();
+      });
+      
+      usersTabBtn.addEventListener('click', () => {
+        // Update active tab
+        vaultsTabBtn.classList.remove('active');
+        rolesTabBtn.classList.remove('active');
+        usersTabBtn.classList.add('active');
+        
+        // Show/hide content
+        vaultsContent.classList.remove('active');
+        rolesContent.classList.remove('active');
+        usersContent.classList.add('active');
+        
+        // Load data
+        loadUsers();
+      });
+    }
+    
+    // Initialize the dashboard
+    async function initDashboard() {
+      console.log('Initializing dashboard...');
+      
+      // Setup tabs
+      setupTabs();
+      
+      // Check API connection
+      const connected = await checkApiConnection();
+      
+      if (connected) {
+        // Load initial data (vaults tab is active by default)
+        loadVaults();
+      } else {
+        // Show errors in each tab
+        document.getElementById('vaultsError').textContent = 'Unable to connect to API. Please check server status.';
+        document.getElementById('vaultsError').style.display = 'block';
+        document.getElementById('vaultsLoading').style.display = 'none';
+        
+        document.getElementById('rolesError').textContent = 'Unable to connect to API. Please check server status.';
+        document.getElementById('rolesError').style.display = 'block';
+        document.getElementById('rolesLoading').style.display = 'none';
+        
+        document.getElementById('usersError').textContent = 'Unable to connect to API. Please check server status.';
+        document.getElementById('usersError').style.display = 'block';
+        document.getElementById('usersLoading').style.display = 'none';
+      }
+    }
+    
+    // Start everything when the page loads
+    document.addEventListener('DOMContentLoaded', initDashboard);
+  </script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minimal Static Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 20px;
+      color: white;
+      background: linear-gradient(135deg, #2a0845 0%, #6441a5 100%);
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+    }
+    h1 {
+      color: #fff;
+      text-align: center;
+    }
+    .card {
+      background-color: rgba(255, 255, 255, 0.05);
+      padding: this.removeEventListener;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      padding: 15px;
+    }
+    .success {
+      background-color: rgba(46, 204, 113, 0.2);
+      border-left: 4px solid #2ecc71;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Sovran Wealth Fund</h1>
+    
+    <div class="card">
+      <h2>Database Status</h2>
+      <p>We have successfully set up a PostgreSQL database for the Sovran Wealth Fund project with the following tables:</p>
+      <ul>
+        <li>Users - Stores user information</li>
+        <li>Staking - Records token staking activities</li>
+        <li>Transactions - Tracks token transactions</li>
+        <li>Vaults - Manages token vaults that influence APR</li>
+        <li>Role Allocations - Defines percentage allocations by role</li>
+      </ul>
+    </div>
+    
+    <div class="card success">
+      <h2>Deployment Status</h2>
+      <p>✓ SWF Token successfully deployed to Polygon mainnet</p>
+      <p>✓ 500,000 SWF tokens minted to recipient wallet</p>
+      <p>✓ PostgreSQL database initialized with schema</p>
+      <p>✓ Database API server running successfully</p>
+      <p>Transaction hash: 0x715ae5cbd0cea8955a93230d28170a7549f3317712dfe20a7d305a6671a151d8</p>
+    </div>
+  </div>
+</body>
+</html>

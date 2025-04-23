@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SWF Database Dashboard</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #2a0845 0%, #6441a5 100%);
+      color: white;
+      min-height: 100vh;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+    
+    .logo-container {
+      display: flex;
+      align-items: center;
+    }
+    
+    .logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+    }
+    
+    .logo span {
+      color: #2a0845;
+      font-weight: bold;
+    }
+    
+    h1, h2 {
+      margin: 0;
+    }
+    
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+    
+    .card {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 32px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .section-title {
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 16px;
+    }
+    
+    th, td {
+      text-align: left;
+      padding: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    th {
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+    
+    .alert {
+      background-color: #10b981;
+      color: white;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+    
+    .alert.error {
+      background-color: #ef4444;
+    }
+    
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s linear infinite;
+      margin-right: 10px;
+    }
+    
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    
+    .tab-buttons {
+      display: flex;
+      margin-bottom: 16px;
+    }
+    
+    .tab-button {
+      background-color: rgba(0, 0, 0, 0.2);
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 8px 8px 0 0;
+      margin-right: 4px;
+    }
+    
+    .tab-button.active {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-container">
+      <div class="logo">
+        <span>SWF</span>
+      </div>
+      <h1>Sovran Wealth Fund - Database Dashboard</h1>
+    </div>
+  </header>
+  
+  <main>
+    <div class="alert" id="connectionStatus">
+      <span class="loading"></span> Connecting to database...
+    </div>
+    
+    <div class="tab-buttons">
+      <button class="tab-button active" data-tab="vaults">Vaults</button>
+      <button class="tab-button" data-tab="roles">Role Allocations</button>
+      <button class="tab-button" data-tab="transactions">Latest Transactions</button>
+      <button class="tab-button" data-tab="users">Users</button>
+    </div>
+    
+    <!-- Vaults Tab -->
+    <div class="tab-content active" id="vaultsTab">
+      <div class="card">
+        <h2 class="section-title">SWF Vaults</h2>
+        <p>These vaults manage the token deposits and influence the dynamic APR calculations.</p>
+        
+        <div id="vaultsLoading">
+          <span class="loading"></span> Loading vault data...
+        </div>
+        
+        <table id="vaultsTable" style="display: none;">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Total Deposit</th>
+              <th>Current APR</th>
+              <th>Min APR</th>
+              <th>Max APR</th>
+              <th>Last Updated</th>
+            </tr>
+          </thead>
+          <tbody id="vaultsTableBody">
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <!-- Role Allocations Tab -->
+    <div class="tab-content" id="rolesTab">
+      <div class="card">
+        <h2 class="section-title">Role Allocations</h2>
+        <p>These allocations determine how tokens are distributed across different roles within the ecosystem.</p>
+        
+        <div id="rolesLoading">
+          <span class="loading"></span> Loading role data...
+        </div>
+        
+        <table id="rolesTable" style="display: none;">
+          <thead>
+            <tr>
+              <th>Role</th>
+              <th>Percentage</th>
+              <th>Wallet Address</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody id="rolesTableBody">
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <!-- Transactions Tab -->
+    <div class="tab-content" id="transactionsTab">
+      <div class="card">
+        <h2 class="section-title">Latest Transactions</h2>
+        <p>Recent token transactions recorded in the database.</p>
+        
+        <div id="transactionsLoading">
+          <span class="loading"></span> Loading transaction data...
+        </div>
+        
+        <div id="noTransactions" style="display: none;">
+          <p>No transactions have been recorded yet.</p>
+          <p>When users interact with the SWF token, transactions will appear here.</p>
+        </div>
+        
+        <table id="transactionsTable" style="display: none;">
+          <thead>
+            <tr>
+              <th>Tx Hash</th>
+              <th>From</th>
+              <th>To</th>
+              <th>Amount</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Timestamp</th>
+            </tr>
+          </thead>
+          <tbody id="transactionsTableBody">
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <!-- Users Tab -->
+    <div class="tab-content" id="usersTab">
+      <div class="card">
+        <h2 class="section-title">Registered Users</h2>
+        <p>Users who have interacted with the SWF token system.</p>
+        
+        <div id="usersLoading">
+          <span class="loading"></span> Loading user data...
+        </div>
+        
+        <table id="usersTable" style="display: none;">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Address</th>
+              <th>Username</th>
+              <th>Role</th>
+              <th>Created At</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody">
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+  
+  <script>
+    // API Base URL - Update to use the current hostname to avoid CORS issues
+    const API_BASE_URL = `http://${window.location.hostname}:5001/api`;
+    
+    // Function to format large numbers with commas
+    function formatNumber(num) {
+      return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+    
+    // Function to format timestamps
+    function formatTimestamp(timestamp) {
+      const date = new Date(timestamp);
+      return date.toLocaleString();
+    }
+    
+    // Function to truncate Ethereum addresses
+    function truncateAddress(address) {
+      if (!address) return '';
+      return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
+    }
+    
+    // Function to convert Wei to display format
+    function weiToDisplay(wei) {
+      try {
+        // Return zero if wei is null or undefined
+        if (wei === null || wei === undefined) {
+          return '0.0000';
+        }
+        
+        // If wei is a string, convert it to BigInt
+        if (typeof wei === 'string') {
+          wei = BigInt(wei);
+        }
+        
+        // Convert to Ether (divide by 10^18)
+        const divisor = BigInt(10) ** BigInt(18);
+        const whole = wei / divisor;
+        
+        // Get remainder
+        const remainder = wei % divisor;
+        const decimal = remainder.toString().padStart(18, '0');
+        const truncatedDecimal = decimal.substring(0, 4);
+        
+        // Format with commas
+        return formatNumber(whole.toString()) + '.' + truncatedDecimal;
+      } catch (error) {
+        console.error('Error converting wei:', error, wei);
+        return '0.0000'; // Return default value on error
+      }
+    }
+    
+    // Function to check connection to API
+    async function checkConnection() {
+      const statusElement = document.getElementById('connectionStatus');
+      
+      try {
+        const response = await fetch(`${API_BASE_URL}/health`);
+        const data = await response.json();
+        
+        if (data.status === 'OK') {
+          statusElement.textContent = 'Connected to database successfully!';
+          statusElement.classList.remove('error');
+          return true;
+        } else {
+          throw new Error('API returned unexpected status');
+        }
+      } catch (error) {
+        console.error('Connection error:', error);
+        statusElement.textContent = 'Error connecting to database. Please try again later.';
+        statusElement.classList.add('error');
+        return false;
+      }
+    }
+    
+    // Function to load vaults data
+    async function loadVaults() {
+      const loadingElement = document.getElementById('vaultsLoading');
+      const tableElement = document.getElementById('vaultsTable');
+      const tableBodyElement = document.getElementById('vaultsTableBody');
+      
+      try {
+        const response = await fetch(`${API_BASE_URL}/vaults`);
+        const vaults = await response.json();
+        
+        // Clear existing table rows
+        tableBodyElement.innerHTML = '';
+        
+        if (vaults.length === 0) {
+          tableBodyElement.innerHTML = '<tr><td colspan="7">No vaults found</td></tr>';
+        } else {
+          vaults.forEach(vault => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${vault.id}</td>
+              <td>${vault.name}</td>
+              <td>${weiToDisplay(vault.total_deposit)} SWF</td>
+              <td>${vault.current_apr}%</td>
+              <td>${vault.min_apr}%</td>
+              <td>${vault.max_apr}%</td>
+              <td>${formatTimestamp(vault.last_updated)}</td>
+            `;
+            tableBodyElement.appendChild(row);
+          });
+        }
+        
+        // Hide loading, show table
+        loadingElement.style.display = 'none';
+        tableElement.style.display = 'table';
+      } catch (error) {
+        console.error('Error loading vaults:', error);
+        loadingElement.textContent = 'Error loading vault data. Please try again later.';
+      }
+    }
+    
+    // Function to load role allocations
+    async function loadRoles() {
+      const loadingElement = document.getElementById('rolesLoading');
+      const tableElement = document.getElementById('rolesTable');
+      const tableBodyElement = document.getElementById('rolesTableBody');
+      
+      try {
+        const response = await fetch(`${API_BASE_URL}/roles`);
+        const roles = await response.json();
+        
+        // Clear existing table rows
+        tableBodyElement.innerHTML = '';
+        
+        if (roles.length === 0) {
+          tableBodyElement.innerHTML = '<tr><td colspan="4">No role allocations found</td></tr>';
+        } else {
+          roles.forEach(role => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${role.role_name}</td>
+              <td>${role.allocation_percentage}%</td>
+              <td title="${role.wallet_address}">${truncateAddress(role.wallet_address)}</td>
+              <td>${role.description || '-'}</td>
+            `;
+            tableBodyElement.appendChild(row);
+          });
+        }
+        
+        // Hide loading, show table
+        loadingElement.style.display = 'none';
+        tableElement.style.display = 'table';
+      } catch (error) {
+        console.error('Error loading roles:', error);
+        loadingElement.textContent = 'Error loading role allocation data. Please try again later.';
+      }
+    }
+    
+    // Function to load latest transactions
+    async function loadTransactions() {
+      const loadingElement = document.getElementById('transactionsLoading');
+      const tableElement = document.getElementById('transactionsTable');
+      const tableBodyElement = document.getElementById('transactionsTableBody');
+      const noTransactionsElement = document.getElementById('noTransactions');
+      
+      try {
+        // This is just a placeholder - we don't have a specific endpoint for latest transactions
+        // In a real implementation, you would call appropriate API endpoint
+        const response = await fetch(`${API_BASE_URL}/transactions/address/0xCe36333A88c2EA01f28f63131fA7dfa80AD021F6`);
+        const transactions = await response.json();
+        
+        // Clear existing table rows
+        tableBodyElement.innerHTML = '';
+        
+        if (!Array.isArray(transactions) || transactions.length === 0) {
+          // Show no transactions message, hide table
+          noTransactionsElement.style.display = 'block';
+          tableElement.style.display = 'none';
+        } else {
+          transactions.forEach(tx => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td title="${tx.tx_hash}">${truncateAddress(tx.tx_hash)}</td>
+              <td title="${tx.from_address}">${truncateAddress(tx.from_address)}</td>
+              <td title="${tx.to_address}">${truncateAddress(tx.to_address)}</td>
+              <td>${weiToDisplay(tx.amount)} SWF</td>
+              <td>${tx.transaction_type}</td>
+              <td>${tx.status}</td>
+              <td>${formatTimestamp(tx.timestamp)}</td>
+            `;
+            tableBodyElement.appendChild(row);
+          });
+          
+          // Show table, hide no transactions message
+          tableElement.style.display = 'table';
+          noTransactionsElement.style.display = 'none';
+        }
+        
+        // Hide loading
+        loadingElement.style.display = 'none';
+      } catch (error) {
+        console.error('Error loading transactions:', error);
+        loadingElement.textContent = 'Error loading transaction data. Please try again later.';
+        // Assume no transactions for now
+        noTransactionsElement.style.display = 'block';
+      }
+    }
+    
+    // Function to load users
+    async function loadUsers() {
+      const loadingElement = document.getElementById('usersLoading');
+      const tableElement = document.getElementById('usersTable');
+      const tableBodyElement = document.getElementById('usersTableBody');
+      
+      try {
+        // For now, we'll just show the admin user we know exists
+        // In a real implementation, you would have an endpoint to get all users
+        const response = await fetch(`${API_BASE_URL}/users/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266`);
+        let users = [];
+        
+        try {
+          const user = await response.json();
+          if (!user.error) {
+            users = [user];
+          }
+        } catch (e) {
+          // If parsing fails, assume no users
+        }
+        
+        // Clear existing table rows
+        tableBodyElement.innerHTML = '';
+        
+        if (users.length === 0) {
+          tableBodyElement.innerHTML = '<tr><td colspan="5">No users found</td></tr>';
+        } else {
+          users.forEach(user => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${user.id}</td>
+              <td title="${user.address}">${truncateAddress(user.address)}</td>
+              <td>${user.username || '-'}</td>
+              <td>${user.role}</td>
+              <td>${formatTimestamp(user.created_at)}</td>
+            `;
+            tableBodyElement.appendChild(row);
+          });
+        }
+        
+        // Hide loading, show table
+        loadingElement.style.display = 'none';
+        tableElement.style.display = 'table';
+      } catch (error) {
+        console.error('Error loading users:', error);
+        loadingElement.textContent = 'Error loading user data. Please try again later.';
+      }
+    }
+    
+    // Function to initialize tabs
+    function initTabs() {
+      const tabButtons = document.querySelectorAll('.tab-button');
+      const tabContents = document.querySelectorAll('.tab-content');
+      
+      tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          // Get tab ID
+          const tabId = button.getAttribute('data-tab');
+          
+          // Remove active class from all buttons and tabs
+          tabButtons.forEach(btn => btn.classList.remove('active'));
+          tabContents.forEach(tab => tab.classList.remove('active'));
+          
+          // Add active class to clicked button and corresponding tab
+          button.classList.add('active');
+          document.getElementById(`${tabId}Tab`).classList.add('active');
+          
+          // Load data for the selected tab
+          if (tabId === 'vaults') {
+            loadVaults();
+          } else if (tabId === 'roles') {
+            loadRoles();
+          } else if (tabId === 'transactions') {
+            loadTransactions();
+          } else if (tabId === 'users') {
+            loadUsers();
+          }
+        });
+      });
+    }
+    
+    // Initialize when the page loads
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Set up tabs
+      initTabs();
+      
+      // Check connection to API
+      const connected = await checkConnection();
+      
+      if (connected) {
+        // Load initial data for the active tab (vaults)
+        loadVaults();
+      }
+    });
+  </script>
+</body>
+</html>

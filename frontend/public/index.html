@@ -3,378 +3,409 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sovran Wealth Fund (SWF) - Token Dashboard</title>
-  
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- Ethers.js -->
-  <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
-  
-  <!-- Token Info JS -->
-  <script src="token-info.js"></script>
-  <script src="swf-token-tracker.js"></script>
-  
+  <title>Sovran Wealth Fund (SWF)</title>
   <style>
-    .gradient-bg {
-      background: linear-gradient(135deg, #2a0845 0%, #6441a5 100%);
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: #f8f9fa;
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .api-status {
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      padding: 6px 12px;
+      border-radius: 4px;
+    }
+    .api-status.connected {
+      background-color: rgba(16, 185, 129, 0.2);
+      color: #10b981;
+    }
+    .api-status.disconnected {
+      background-color: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+    }
+    .status-indicator {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+    .connected .status-indicator {
+      background-color: #10b981;
+    }
+    .disconnected .status-indicator {
+      background-color: #ef4444;
     }
     .card {
-      backdrop-filter: blur(16px) saturate(180%);
-      -webkit-backdrop-filter: blur(16px) saturate(180%);
-      background-color: rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-    }
-    .network-status {
-      background-color: #8247e5;
-      color: white;
-      font-size: 0.8rem;
-      padding: 0.25rem 0.75rem;
-      border-radius: 1rem;
-    }
-    .connect-btn {
-      background: linear-gradient(90deg, #00d2ff 0%, #3a7bd5 100%);
-      transition: all 0.3s ease;
-    }
-    .connect-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-    }
-    .metric-box {
       background-color: rgba(255, 255, 255, 0.05);
-      border-radius: 0.5rem;
-      padding: 1rem;
-      transition: all 0.3s ease;
-    }
-    .metric-box:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-      transform: translateY(-2px);
-    }
-    .pulse-ring {
-      animation: pulse 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
-    }
-    .notification {
-      position: relative;
-      padding: 1rem;
-      margin-bottom: 0.5rem;
-      border-radius: 0.5rem;
-      animation: slideIn 0.3s ease;
-      color: white;
-    }
-    .notification.success {
-      background-color: rgba(16, 185, 129, 0.9);
-    }
-    .notification.info {
-      background-color: rgba(59, 130, 246, 0.9);
-    }
-    .notification.error {
-      background-color: rgba(239, 68, 68, 0.9);
-    }
-    .notification.fade-out {
-      animation: fadeOut 0.5s ease forwards;
-    }
-    #notificationsContainer {
-      position: fixed;
-      top: 1rem;
-      right: 1rem;
-      width: 300px;
-      z-index: 50;
-    }
-    .token-tracker {
-      position: fixed;
-      bottom: 1rem;
-      right: 1rem;
-      width: 300px;
-      z-index: 40;
-      backdrop-filter: blur(16px) saturate(180%);
-      background-color: rgba(255, 255, 255, 0.1);
-      border-radius: 0.5rem;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      padding: 1rem;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
-    @keyframes pulse {
-      0% {
-        transform: scale(0.95);
-        box-shadow: 0 0 0 0 rgba(130, 71, 229, 0.7);
-      }
-      70% {
-        transform: scale(1);
-        box-shadow: 0 0 0 10px rgba(130, 71, 229, 0);
-      }
-      100% {
-        transform: scale(0.95);
-        box-shadow: 0 0 0 0 rgba(130, 71, 229, 0);
-      }
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
     }
-    @keyframes slideIn {
-      from {
-        transform: translateX(100%);
-        opacity: 0;
-      }
-      to {
-        transform: translateX(0);
-        opacity: 1;
-      }
+    .dashboard-section {
+      margin-bottom: 40px;
     }
-    @keyframes fadeOut {
-      from {
-        opacity: 1;
-      }
-      to {
-        opacity: 0;
-      }
+    h1, h2, h3 {
+      margin-top: 0;
+      color: #f8f9fa;
     }
-    .spinner {
-      width: 1rem;
-      height: 1rem;
+    h1 {
+      font-size: 2.2rem;
+    }
+    h2 {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+    }
+    .data-value {
+      font-size: 1.8rem;
+      font-weight: bold;
+      margin: 10px 0;
+      color: #60a5fa;
+    }
+    .data-label {
+      color: #9ca3af;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .data-secondary {
+      color: #d1d5db;
+      font-size: 0.9rem;
+    }
+    .role-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+    }
+    .role-item:last-child {
+      border-bottom: none;
+    }
+    .button {
+      display: inline-block;
+      background-color: #4f46e5;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 14px;
+      transition: background-color 0.2s;
+    }
+    .button:hover {
+      background-color: #4338ca;
+    }
+    .loading {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
       border: 2px solid rgba(255, 255, 255, 0.3);
       border-radius: 50%;
-      border-top-color: white;
-      animation: spin 1s ease-in-out infinite;
+      border-top-color: #fff;
+      animation: spin 1s linear infinite;
+      margin-right: 8px;
+    }
+    .badge {
       display: inline-block;
-      margin-right: 0.5rem;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .badge-primary {
+      background-color: rgba(79, 70, 229, 0.2);
+      color: #818cf8;
+    }
+    .badge-success {
+      background-color: rgba(16, 185, 129, 0.2);
+      color: #10b981;
+    }
+    .actions {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
     }
     @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
+      to { transform: rotate(360deg); }
     }
   </style>
 </head>
-<body class="gradient-bg min-h-screen text-white">
-  <header class="p-4 flex justify-between items-center">
-    <div class="flex items-center">
-      <div class="h-10 w-10 rounded-full bg-white mr-3 flex items-center justify-center">
-        <span class="font-bold text-purple-900">SWF</span>
+<body>
+  <div class="container">
+    <header>
+      <h1>Sovran Wealth Fund</h1>
+      <div id="apiStatus" class="api-status disconnected">
+        <span class="status-indicator"></span>
+        Connecting...
       </div>
-      <h1 class="text-2xl font-bold">Sovran Wealth Fund</h1>
-    </div>
-    
-    <div class="flex items-center">
-      <span class="network-status mr-4">Connecting...</span>
-      <div id="walletInfo" class="hidden">
-        <div class="flex items-center">
-          <div class="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center mr-2 pulse-ring">
-            <span class="text-xs">🔒</span>
-          </div>
-          <div>
-            <span id="accountDisplay" class="font-mono text-sm">0x0000...0000</span>
-            <span class="hidden" id="fullAccountDisplay"></span>
-          </div>
+    </header>
+
+    <div class="dashboard-section">
+      <h2>Token Overview</h2>
+      <div class="cards-grid">
+        <div class="card">
+          <div class="data-label">Token Contract</div>
+          <div class="data-value" id="tokenAddress">0x15AD65Fb62CD9147Aa4443dA89828A693228b5F7</div>
+          <div class="data-secondary">Polygon Mainnet</div>
+        </div>
+        <div class="card">
+          <div class="data-label">Total Supply</div>
+          <div class="data-value" id="tokenSupply">500,000</div>
+          <div class="data-secondary">SWF Tokens</div>
+        </div>
+        <div class="card">
+          <div class="data-label">Current APR</div>
+          <div class="data-value" id="currentApr">15%</div>
+          <div class="data-secondary">Dynamic based on vault deposits</div>
         </div>
       </div>
-      <button class="connect-btn ml-4 py-2 px-6 rounded-full font-bold shadow-lg">Connect Wallet</button>
     </div>
-  </header>
-  
-  <main class="container mx-auto p-4">
-    <!-- Welcome Message / Connection Prompt -->
-    <div id="connectPrompt" class="text-center py-16">
-      <h2 class="text-4xl font-bold mb-4">Welcome to Sovran Wealth Fund</h2>
-      <p class="text-xl mb-8 max-w-2xl mx-auto opacity-80">Connect your wallet to view your token balance, stake your tokens, and view your rewards.</p>
-      <button class="connect-btn py-3 px-8 rounded-full font-bold text-lg shadow-lg">Connect Wallet</button>
-    </div>
-    
-    <!-- Dashboard (Hidden until connected) -->
-    <div id="dashboard" class="hidden">
-      <!-- Token Metrics -->
-      <div class="mb-8">
-        <h2 class="text-2xl font-bold mb-4">Token Metrics</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="metric-box">
-            <h3 class="text-lg font-semibold mb-2">Total Supply</h3>
-            <p class="metric-value text-3xl font-bold">--</p>
-            <p class="text-sm opacity-70">SWF</p>
-          </div>
-          <div class="metric-box">
-            <h3 class="text-lg font-semibold mb-2">Current APR</h3>
-            <p class="metric-value text-3xl font-bold">15%</p>
-            <p class="text-sm opacity-70">Annual Percentage Rate</p>
-          </div>
-          <div class="metric-box">
-            <h3 class="text-lg font-semibold mb-2">Staked Total</h3>
-            <p class="metric-value text-3xl font-bold">--</p>
-            <p class="text-sm opacity-70">SWF</p>
-          </div>
+
+    <div class="dashboard-section">
+      <h2>Latest Transaction</h2>
+      <div class="card" id="latestTransaction">
+        <div id="txLoading">
+          <span class="loading"></span> Loading transaction data...
         </div>
-      </div>
-      
-      <!-- Staking Section -->
-      <div class="mb-8">
-        <h2 class="text-2xl font-bold mb-4">Staking Dashboard</h2>
-        <div class="card p-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- Staking Info -->
+        <div id="txContent" style="display: none;">
+          <div class="data-label">Transaction Hash</div>
+          <div class="data-value" id="txHash" style="font-size: 1.2rem; word-break: break-all;"></div>
+          
+          <div style="display: flex; justify-content: space-between; margin-top: 15px;">
             <div>
-              <h3 class="text-xl font-bold mb-4">Your Staking Stats</h3>
-              <div class="grid grid-cols-2 gap-4 mb-6">
-                <div class="stat">
-                  <p class="text-sm opacity-70">Your Staked Balance</p>
-                  <p class="stat-value text-xl font-bold">-- SWF</p>
-                </div>
-                <div class="stat">
-                  <p class="text-sm opacity-70">Reward Rate</p>
-                  <p class="stat-value text-xl font-bold">15% APR</p>
-                </div>
-                <div class="stat">
-                  <p class="text-sm opacity-70">Rewards Earned</p>
-                  <p class="stat-value text-xl font-bold">-- SWF</p>
-                </div>
-                <div class="stat">
-                  <p class="text-sm opacity-70">Time Staked</p>
-                  <p class="stat-value text-xl font-bold">-- days</p>
-                </div>
-              </div>
-              <div class="flex gap-3">
-                <button class="bg-indigo-600 hover:bg-indigo-700 py-2 px-4 rounded-lg font-bold transition">
-                  Claim Rewards
-                </button>
-                <button class="bg-pink-600 hover:bg-pink-700 py-2 px-4 rounded-lg font-bold transition">
-                  Unstake Tokens
-                </button>
-              </div>
+              <div class="data-label">From</div>
+              <div class="data-secondary" id="txFrom"></div>
             </div>
-            
-            <!-- Staking Form -->
             <div>
-              <h3 class="text-xl font-bold mb-4">Stake Your Tokens</h3>
-              <div class="bg-white/5 p-4 rounded-lg mb-4">
-                <div class="flex justify-between mb-2">
-                  <span>Amount to Stake</span>
-                  <span>Balance: -- SWF</span>
-                </div>
-                <div class="flex gap-2">
-                  <input type="number" placeholder="Enter amount" class="w-full bg-white/10 p-3 rounded-lg text-white" />
-                  <button class="bg-white/10 py-2 px-3 rounded-lg">MAX</button>
-                </div>
-              </div>
-              <div class="flex gap-3">
-                <button class="bg-gradient-to-r from-green-500 to-emerald-600 w-full py-3 rounded-lg font-bold transition hover:opacity-90">
-                  Stake Tokens
-                </button>
-              </div>
-              <p class="text-sm opacity-70 mt-3">
-                * Staking requires approval of the SWF token contract. Minimum stake is 50 SWF.
-              </p>
+              <div class="data-label">To</div>
+              <div class="data-secondary" id="txTo"></div>
             </div>
           </div>
-        </div>
-      </div>
-      
-      <!-- Basket Vault Section -->
-      <div>
-        <h2 class="text-2xl font-bold mb-4">Basket Vault</h2>
-        <div class="card p-6">
-          <div class="mb-6">
-            <p class="mb-4">
-              The SWF Basket Vault stores underlying assets that back the SWF token. Deposit into the vault to increase APR stability.
-            </p>
-            <div class="bg-white/5 p-4 rounded-lg">
-              <h4 class="font-bold mb-2">Current Vault Metrics</h4>
-              <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div>
-                  <p class="text-sm opacity-70">Total Value Locked</p>
-                  <p class="text-xl font-bold">$--</p>
-                </div>
-                <div>
-                  <p class="text-sm opacity-70">Asset Count</p>
-                  <p class="text-xl font-bold">--</p>
-                </div>
-                <div>
-                  <p class="text-sm opacity-70">Staking Impact</p>
-                  <p class="text-xl font-bold">+3.2%</p>
-                </div>
-                <div>
-                  <p class="text-sm opacity-70">Reserve Ratio</p>
-                  <p class="text-xl font-bold">--</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <div style="display: flex; justify-content: space-between; margin-top: 15px;">
             <div>
-              <h4 class="font-bold mb-3">Deposit to Vault</h4>
-              <div class="bg-white/5 p-4 rounded-lg mb-4">
-                <div class="flex justify-between mb-2">
-                  <span>Asset</span>
-                  <span>Balance: --</span>
-                </div>
-                <select class="w-full bg-white/10 p-3 rounded-lg text-white mb-4">
-                  <option>USDC</option>
-                  <option>USDT</option>
-                  <option>DAI</option>
-                  <option>WETH</option>
-                  <option>WBTC</option>
-                </select>
-                <div class="flex justify-between mb-2">
-                  <span>Amount</span>
-                </div>
-                <div class="flex gap-2">
-                  <input type="number" placeholder="Enter amount" class="w-full bg-white/10 p-3 rounded-lg text-white" />
-                  <button class="bg-white/10 py-2 px-3 rounded-lg">MAX</button>
-                </div>
-              </div>
-              <button class="bg-gradient-to-r from-blue-500 to-indigo-600 w-full py-3 rounded-lg font-bold transition hover:opacity-90">
-                Deposit to Vault
-              </button>
+              <div class="data-label">Amount</div>
+              <div class="data-secondary" id="txAmount"></div>
             </div>
             <div>
-              <h4 class="font-bold mb-3">Vault Asset Allocation</h4>
-              <div class="bg-white/5 p-4 rounded-lg h-64 flex items-center justify-center">
-                <p class="opacity-70">Connect your wallet to view vault assets</p>
-                <!-- Chart will go here -->
+              <div class="data-label">Type</div>
+              <div class="data-secondary">
+                <span class="badge badge-primary" id="txType"></span>
+              </div>
+            </div>
+            <div>
+              <div class="data-label">Status</div>
+              <div class="data-secondary">
+                <span class="badge badge-success" id="txStatus"></span>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </main>
-  
-  <footer class="container mx-auto p-4 mt-10 opacity-60 text-sm">
-    <div class="flex flex-col md:flex-row justify-between items-center">
-      <p>© 2025 Sovran Wealth Fund. All rights reserved.</p>
-      <div class="flex gap-4 mt-4 md:mt-0">
-        <a href="#" class="hover:text-blue-400">Documentation</a>
-        <a href="#" class="hover:text-blue-400">GitHub</a>
-        <a href="#" class="hover:text-blue-400">Smart Contract</a>
+
+    <div class="dashboard-section">
+      <h2>Role Allocations</h2>
+      <div class="card">
+        <div id="rolesLoading">
+          <span class="loading"></span> Loading role allocation data...
+        </div>
+        <div id="rolesList" style="display: none;">
+          <!-- Role items will be inserted here dynamically -->
+        </div>
       </div>
     </div>
-  </footer>
-  
-  <!-- Notifications Container -->
-  <div id="notificationsContainer"></div>
-  
-  <!-- Token Tracker Widget -->
-  <div class="token-tracker">
-    <h3 class="text-lg font-bold mb-2">SWF Token Tracker</h3>
-    <div id="transactionStatus" class="bg-white/5 p-3 rounded-lg mb-3">
-      <p class="text-sm mb-2">Token mint transaction (500,000 SWF to your wallet):</p>
-      <div class="flex items-center text-xs text-green-400">
-        <span class="mr-2">✓</span>
-        <span>Transaction confirmed!</span>
-      </div>
-      <p class="text-xs mt-2 opacity-70">Transaction Hash: 0x715ae5cbd0cea8955a93230d28170a7549f3317712dfe20a7d305a6671a151d8</p>
-      <p class="text-xs mt-1 opacity-70">Status: Successfully minted 500,000 SWF tokens</p>
+
+    <div class="actions">
+      <a href="./swf-database.html" class="button">Database Dashboard</a>
+      <a href="./minimal.html" class="button">Static Status Page</a>
     </div>
-    <div class="bg-white/5 p-3 rounded-lg mb-3">
-      <div class="flex justify-between items-center mb-1">
-        <span class="font-semibold">Your Token Balance:</span>
-        <span id="tokenBalance" class="font-mono">-- SWF</span>
-      </div>
-      <div class="flex justify-between items-center text-xs opacity-70">
-        <span>Status:</span>
-        <span id="trackerStatus">Not started</span>
-      </div>
-    </div>
-    <button id="startTracker" class="bg-gradient-to-r from-purple-500 to-indigo-600 w-full py-2 rounded-lg font-bold text-sm transition hover:opacity-90 mb-3">
-      Start Token Tracker
-    </button>
-    <button id="deployStaking" class="bg-gradient-to-r from-pink-500 to-rose-600 w-full py-2 rounded-lg font-bold text-sm transition hover:opacity-90">
-      Deploy Staking Engine
-    </button>
   </div>
+
+  <script>
+    // Base URL for API
+    const API_BASE_URL = `http://${window.location.hostname}:5001/api`;
+    
+    // Helper function to truncate addresses
+    function truncateAddress(address) {
+      return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
+    }
+    
+    // Helper function to format wei values to display format
+    function formatWei(wei) {
+      // Convert to ether (divide by 10^18)
+      const ether = BigInt(wei) / BigInt(10 ** 18);
+      return ether.toLocaleString();
+    }
+    
+    // Helper function to format timestamp
+    function formatTimestamp(timestamp) {
+      const date = new Date(timestamp);
+      return date.toLocaleString();
+    }
+    
+    // Function to check API connection
+    async function checkAPIConnection() {
+      const statusElement = document.getElementById('apiStatus');
+      
+      try {
+        const response = await fetch(`${API_BASE_URL}/health`);
+        const data = await response.json();
+        
+        if (data.status === 'OK') {
+          statusElement.className = 'api-status connected';
+          statusElement.innerHTML = '<span class="status-indicator"></span>Connected';
+          console.log('API connection successful');
+          return true;
+        } else {
+          throw new Error('API status not OK');
+        }
+      } catch (error) {
+        console.error('API connection error:', error);
+        statusElement.className = 'api-status disconnected';
+        statusElement.innerHTML = '<span class="status-indicator"></span>Disconnected';
+        return false;
+      }
+    }
+    
+    // Function to load the latest transaction
+    async function loadLatestTransaction() {
+      const txLoading = document.getElementById('txLoading');
+      const txContent = document.getElementById('txContent');
+      
+      try {
+        const response = await fetch(`${API_BASE_URL}/transactions/address/0xCe36333A88c2EA01f28f63131fA7dfa80AD021F6`);
+        const transactions = await response.json();
+        
+        if (transactions && transactions.length > 0) {
+          const tx = transactions[0]; // Get the first (latest) transaction
+          
+          // Update the transaction details in the UI
+          document.getElementById('txHash').textContent = tx.tx_hash;
+          document.getElementById('txFrom').textContent = truncateAddress(tx.from_address);
+          document.getElementById('txTo').textContent = truncateAddress(tx.to_address);
+          document.getElementById('txAmount').textContent = `${formatWei(tx.amount)} SWF`;
+          document.getElementById('txType').textContent = tx.transaction_type;
+          document.getElementById('txStatus').textContent = tx.status;
+          
+          // Show the content and hide the loading indicator
+          txLoading.style.display = 'none';
+          txContent.style.display = 'block';
+        } else {
+          throw new Error('No transactions found');
+        }
+      } catch (error) {
+        console.error('Error loading transaction:', error);
+        txLoading.textContent = 'Error loading transaction data. Please try again later.';
+      }
+    }
+    
+    // Function to load role allocations
+    async function loadRoleAllocations() {
+      const rolesLoading = document.getElementById('rolesLoading');
+      const rolesList = document.getElementById('rolesList');
+      
+      try {
+        const response = await fetch(`${API_BASE_URL}/roles`);
+        const roles = await response.json();
+        
+        if (roles && roles.length > 0) {
+          // Process roles to remove duplicates (take the highest ID for each role name)
+          const uniqueRoles = {};
+          roles.forEach(role => {
+            const key = role.role_name;
+            if (!uniqueRoles[key] || uniqueRoles[key].id < role.id) {
+              uniqueRoles[key] = role;
+            }
+          });
+          
+          // Build the UI elements
+          rolesList.innerHTML = '';
+          Object.values(uniqueRoles).forEach(role => {
+            const roleItem = document.createElement('div');
+            roleItem.className = 'role-item';
+            roleItem.innerHTML = `
+              <div>
+                <strong>${role.role_name}</strong>
+                <div class="data-secondary">${role.description || ''}</div>
+              </div>
+              <div>
+                <div>${role.allocation_percentage}%</div>
+                <div class="data-secondary" title="${role.wallet_address}">${truncateAddress(role.wallet_address)}</div>
+              </div>
+            `;
+            rolesList.appendChild(roleItem);
+          });
+          
+          // Show the content and hide the loading indicator
+          rolesLoading.style.display = 'none';
+          rolesList.style.display = 'block';
+        } else {
+          throw new Error('No role allocations found');
+        }
+      } catch (error) {
+        console.error('Error loading roles:', error);
+        rolesLoading.textContent = 'Error loading role allocation data. Please try again later.';
+      }
+    }
+    
+    // Function to load current APR from vault
+    async function loadCurrentAPR() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/vaults`);
+        const vaults = await response.json();
+        
+        if (vaults && vaults.length > 0) {
+          // Use the first vault's APR
+          const apr = vaults[0].current_apr;
+          document.getElementById('currentApr').textContent = `${apr}%`;
+        }
+      } catch (error) {
+        console.error('Error loading vault APR:', error);
+      }
+    }
+    
+    // Initialize when the page loads
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Check API connection
+      const connected = await checkAPIConnection();
+      
+      if (connected) {
+        // Load data
+        loadLatestTransaction();
+        loadRoleAllocations();
+        loadCurrentAPR();
+      } else {
+        // Update UI to show disconnected state
+        document.getElementById('txLoading').textContent = 'Cannot connect to API server. Please check server status.';
+        document.getElementById('rolesLoading').textContent = 'Cannot connect to API server. Please check server status.';
+      }
+    });
+  </script>
 </body>
 </html>
