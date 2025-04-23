@@ -5,19 +5,19 @@ This guide provides instructions for deploying the Sovran Wealth Fund ERC20 toke
 ## Prerequisites
 
 - Node.js and npm installed
-- A wallet with some MATIC for Polygon Amoy testnet
+- A wallet with some POL tokens for Polygon Amoy testnet
 - Private key of the deployment wallet
 - Alchemy API key (optional, for better RPC endpoint)
 - Polygonscan API key (for contract verification)
 
-## Getting MATIC for Polygon Amoy Testnet
+## Getting POL for Polygon Amoy Testnet
 
-Before deploying, ensure your wallet has MATIC tokens on the Amoy testnet:
+Before deploying, ensure your wallet has POL tokens on the Amoy testnet (POL is the new native token for Polygon networks, replacing MATIC):
 
 1. Visit the Polygon Amoy Faucet: https://amoy.polygon.technology/faucet
 2. Enter your wallet address
 3. Complete any verification steps
-4. Request MATIC tokens (may take a few minutes to arrive)
+4. Request POL tokens (may take a few minutes to arrive)
 5. Verify your balance by checking your address on Amoy Polygonscan: https://amoy.polygonscan.com/
 
 ## Setup Environment

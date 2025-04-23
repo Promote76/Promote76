@@ -13,11 +13,24 @@ async function main() {
     // Get the contract factory
     const SovranWealthFund = await ethers.getContractFactory("SovranWealthFund");
     
-    // Deploy the contract
-    console.log("Deploying SovranWealthFund...");
-    const token = await SovranWealthFund.deploy();
+    // Deploy the contract with optimized gas settings
+    console.log("Deploying SovranWealthFund with optimized gas...");
+    const gasPrice = ethers.utils.parseUnits("25", "gwei"); // 25 gwei minimum required by network
+    
+    // Get deployment gas estimate
+    const deploymentData = SovranWealthFund.getDeployTransaction();
+    const estimatedGas = await ethers.provider.estimateGas(deploymentData);
+    console.log(`Estimated gas: ${estimatedGas.toString()}`);
+    console.log(`Gas price: ${ethers.utils.formatUnits(gasPrice, "gwei")} gwei`);
+    
+    // Deploy with specific gas parameters
+    const token = await SovranWealthFund.deploy({
+      gasPrice: gasPrice,
+      gasLimit: Math.ceil(estimatedGas.toNumber() * 1.1) // Add 10% buffer
+    });
     
     // Wait for the contract to be deployed
+    console.log("Waiting for deployment transaction to be mined...");
     await token.deployed();
     
     console.log("SovranWealthFund deployed to:", token.address);

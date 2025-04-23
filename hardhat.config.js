@@ -26,8 +26,9 @@ module.exports = {
       url: "https://rpc-amoy.polygon.technology", // Public Amoy RPC endpoint
       chainId: 80002, // Amoy chain ID
       accounts: [process.env.PRIVATE_KEY], // Private key from .env file
-      timeout: 120000, // Increase timeout to 120 seconds
-      gasMultiplier: 2 // Increase gas by 100% to avoid underpriced transactions
+      timeout: 300000, // Increase timeout to 5 minutes
+      gasMultiplier: 1, // Normal gas estimation
+      gasPrice: 25000000000 // 25 gwei gas price (minimum required)
     },
     // Hardhat local network for testing
     hardhat: {
