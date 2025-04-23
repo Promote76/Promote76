@@ -13,25 +13,11 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Deploy Sovran Wealth Fund Token"
+args = "check_dependencies"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "check_dependencies"
-
-[[workflows.workflow]]
-name = "Deploy Sovran Wealth Fund Token"
-author = "agent"
-
-[workflows.workflow.metadata]
-agentRequireRestartOnSave = false
-
-[[workflows.workflow.tasks]]
-task = "packager.installForAll"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm install --save-dev hardhat @nomiclabs/hardhat-ethers ethers@^5.0.0 @thirdweb-dev/contracts && npx hardhat run scripts/deploy.js --network mumbai"
+args = "Hardhat Local Node"
 
 [[workflows.workflow]]
 name = "check_dependencies"
@@ -47,5 +33,24 @@ task = "packager.installForAll"
 task = "shell.exec"
 args = "npm list --depth=0 && echo \"Checking hardhat...\" && npx hardhat --version"
 
+[[workflows.workflow]]
+name = "Hardhat Local Node"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx hardhat node"
+waitForPort = 8545
+
 [deployment]
 run = ["sh", "-c", "npm install --save-dev hardhat @nomiclabs/hardhat-ethers ethers@^5.0.0 @thirdweb-dev/contracts && npx hardhat run scripts/deploy.js --network mumbai"]
+
+[[ports]]
+localPort = 8545
+externalPort = 80
