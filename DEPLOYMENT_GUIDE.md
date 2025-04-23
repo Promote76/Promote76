@@ -48,7 +48,7 @@ The project is already configured for Polygon Amoy testnet in `hardhat.config.js
 
 ```javascript
 amoy: {
-  url: "https://rpc-amoy.polygon.technology", // Amoy RPC endpoint
+  url: `https://polygon-amoy.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`, // Alchemy Amoy RPC endpoint
   chainId: 80002, // Amoy chain ID
   accounts: [process.env.PRIVATE_KEY], // Private key from .env file
   timeout: 60000, // Increase timeout to 60 seconds

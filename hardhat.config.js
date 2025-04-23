@@ -23,11 +23,11 @@ module.exports = {
     },
     // Polygon Amoy testnet configuration
     amoy: {
-      url: "https://rpc-amoy.polygon.technology", // Amoy RPC endpoint
+      url: "https://rpc-amoy.polygon.technology", // Public Amoy RPC endpoint
       chainId: 80002, // Amoy chain ID
       accounts: [process.env.PRIVATE_KEY], // Private key from .env file
-      timeout: 60000, // Increase timeout to 60 seconds
-      gasMultiplier: 1.5 // Increase gas by 50% to avoid underpriced transactions
+      timeout: 120000, // Increase timeout to 120 seconds
+      gasMultiplier: 2 // Increase gas by 100% to avoid underpriced transactions
     },
     // Hardhat local network for testing
     hardhat: {
