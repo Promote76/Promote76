@@ -12,6 +12,17 @@ module.exports = {
   
   // Configure networks
   networks: {
+    // Polygon Mainnet configuration
+    polygon: {
+      url: process.env.ALCHEMY_API_KEY 
+           ? `https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`
+           : "https://polygon-rpc.com", // Fallback to public RPC if Alchemy key not available
+      chainId: 137, // Polygon Mainnet chain ID
+      accounts: [process.env.PRIVATE_KEY], // Private key from .env file
+      timeout: 60000, // 1 minute timeout
+      gasMultiplier: 1.2, // Slight increase to avoid underpriced transactions
+      gasPrice: "auto" // Use network's suggested gas price
+    },
     // Polygon Mumbai testnet configuration
     mumbai: {
       url: "https://polygon-mumbai.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161", // Public Infura endpoint
@@ -54,7 +65,8 @@ module.exports = {
   // Etherscan verification configuration
   etherscan: {
     apiKey: {
-      // For Polygon networks (Mumbai and Amoy)
+      // For Polygon networks (Mainnet, Mumbai, and Amoy)
+      polygon: process.env.POLYGONSCAN_API_KEY,
       polygonMumbai: process.env.POLYGONSCAN_API_KEY,
       amoy: process.env.POLYGONSCAN_API_KEY
     },

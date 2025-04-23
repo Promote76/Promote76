@@ -1,13 +1,14 @@
 # Sovran Wealth Fund (SWF) Deployment Guide
 
-This guide provides instructions for deploying the Sovran Wealth Fund token to the Polygon Amoy testnet and interacting with it after deployment.
+This guide provides instructions for deploying the Sovran Wealth Fund token to the Polygon network (both Mainnet and Amoy testnet) and interacting with it after deployment.
 
 ## Prerequisites
 
 - Node.js and npm installed
 - Hardhat development environment set up
-- MetaMask wallet with Polygon Amoy testnet configured
-- Small amount of Amoy POL tokens for gas (0.5 POL minimum)
+- MetaMask wallet configured with:
+  - For testnet: Polygon Amoy testnet and small amount of Amoy POL tokens (0.5 POL minimum)
+  - For mainnet: Polygon mainnet and sufficient MATIC tokens (at least 1 MATIC recommended)
 
 ## Environment Setup
 
@@ -56,6 +57,52 @@ npx hardhat run scripts/deployMinimalContract.js --network amoy
 ```
 
 The deployment process may take several minutes on the Amoy testnet due to network congestion. Once completed, you'll receive a contract address.
+
+## Polygon Mainnet Deployment
+
+⚠️ **IMPORTANT**: Deploying to mainnet will use real MATIC tokens and cannot be undone. Make sure you fully understand the implications before proceeding.
+
+### Prerequisites for Mainnet Deployment
+
+- A wallet with sufficient MATIC tokens (at least 1 MATIC recommended)
+- An Alchemy API key for reliable RPC access
+- Your Polygonscan API key for contract verification
+
+### Mainnet Deployment Options
+
+#### Option 1: Full Contract Deployment
+
+This deploys the complete SovranWealthFund contract to Polygon mainnet:
+
+```bash
+npx hardhat run scripts/deployMainnet.js --network polygon
+```
+
+#### Option 2: Minimal Contract Deployment
+
+This deploys the minimal version of the contract to save on gas costs:
+
+```bash
+npx hardhat run scripts/deployMainnetMinimal.js --network polygon
+```
+
+### Mainnet Contract Verification
+
+After successful deployment, verify your contract on Polygonscan:
+
+```bash
+npx hardhat verify --network polygon YOUR_CONTRACT_ADDRESS
+```
+
+Replace `YOUR_CONTRACT_ADDRESS` with your actual deployed contract address.
+
+### Gas Optimization for Mainnet
+
+The mainnet deployment scripts automatically:
+1. Check current network gas prices
+2. Use a slightly higher gas price (10% premium) for faster inclusion
+3. Estimate deployment costs before executing
+4. Save all deployment details to a JSON file for reference
 
 ## Checking Deployment Status
 
