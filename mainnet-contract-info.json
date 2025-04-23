@@ -1,0 +1,9 @@
+{
+  "network": "Polygon Mainnet",
+  "contractType": "SovranWealthFund (Full)",
+  "contractAddress": "0x15AD65Fb62CD9147Aa4443dA89828A693228b5F7",
+  "deploymentTxHash": "0x0ac75e83b1ddb5261c96d6bf73deded44fe069b96bfec13a0a34ea1c84fcbf73",
+  "blockNumber": 70645384,
+  "gasUsed": "4277541",
+  "deployedAt": "2025-04-23T06:41:48.539Z"
+}
