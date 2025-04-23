@@ -50,7 +50,7 @@ args = "Ultra Minimal Dashboard"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Deployment Server"
+args = "Static HTML Dashboard"
 
 [[workflows.workflow]]
 name = "check_dependencies"
@@ -79,6 +79,7 @@ task = "packager.installForAll"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npx hardhat node"
+waitForPort = 8545
 
 [[workflows.workflow]]
 name = "Static Dashboard"
@@ -186,7 +187,7 @@ args = "node ultra-minimal.js"
 waitForPort = 5000
 
 [[workflows.workflow]]
-name = "Deployment Server"
+name = "Static HTML Dashboard"
 author = "agent"
 
 [workflows.workflow.metadata]
@@ -197,7 +198,7 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "node index.js"
+args = "node static-html-server.js"
 waitForPort = 5000
 
 [deployment]
