@@ -22,10 +22,6 @@ args = "Hardhat Local Node"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Static Dashboard"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
 args = "Simple Dashboard"
 
 [[workflows.workflow.tasks]]
@@ -50,7 +46,7 @@ args = "Ultra Minimal Dashboard"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Absolute Final Dashboard"
+args = "SWF Dashboard"
 
 [[workflows.workflow]]
 name = "check_dependencies"
@@ -80,21 +76,6 @@ task = "packager.installForAll"
 task = "shell.exec"
 args = "npx hardhat node"
 waitForPort = 8545
-
-[[workflows.workflow]]
-name = "Static Dashboard"
-author = "agent"
-
-[workflows.workflow.metadata]
-agentRequireRestartOnSave = false
-
-[[workflows.workflow.tasks]]
-task = "packager.installForAll"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "node static-dashboard.js"
-waitForPort = 5000
 
 [[workflows.workflow]]
 name = "Simple Dashboard"
@@ -187,7 +168,7 @@ args = "node ultra-minimal.js"
 waitForPort = 5000
 
 [[workflows.workflow]]
-name = "Absolute Final Dashboard"
+name = "SWF Dashboard"
 author = "agent"
 
 [workflows.workflow.metadata]
@@ -198,7 +179,7 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "node absolute-final.js"
+args = "node server.js"
 waitForPort = 5000
 
 [deployment]

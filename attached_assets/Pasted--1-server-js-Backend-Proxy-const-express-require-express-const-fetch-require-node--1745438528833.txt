@@ -1,0 +1,98 @@
+
+---
+
+1. server.js — Backend Proxy
+
+const express = require("express");
+const fetch = require("node-fetch");
+const path = require("path");
+const app = express();
+
+app.use(express.json());
+app.use(express.static("public")); // serves static frontend
+
+const HARDHAT_RPC = "http://localhost:8545";
+
+app.post("/rpc", async (req, res) => {
+  try {
+    const response = await fetch(HARDHAT_RPC, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(req.body),
+    });
+
+    const json = await response.json();
+    res.json(json);
+  } catch (err) {
+    console.error("Proxy error:", err.message);
+    res.status(500).json({ error: "RPC Proxy Failed", details: err.message });
+  }
+});
+
+app.get("/health", (req, res) => res.send("OK"));
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
+
+
+---
+
+2. public/index.html — Frontend
+
+Create a public folder and add this index.html file inside it:
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SWF Dashboard</title>
+</head>
+<body>
+  <h1>SWF Dashboard</h1>
+  <p id="output">Loading...</p>
+
+  <script>
+    fetch("/rpc", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        method: "eth_blockNumber",
+        params: [],
+        id: 1
+      })
+    })
+      .then(res => res.json())
+      .then(data => {
+        const blockHex = data.result;
+        const blockNumber = parseInt(blockHex, 16);
+        document.getElementById("output").innerText = "Latest Block: " + blockNumber;
+      })
+      .catch(err => {
+        document.getElementById("output").innerText = "Error: " + err.message;
+      });
+  </script>
+</body>
+</html>
+
+
+---
+
+3. Replit Setup Instructions
+
+1. Create a new Node.js Replit
+
+
+2. Add a public folder and place index.html inside it
+
+
+3. Paste server.js into the main file
+
+
+4. Install dependencies in Shell:
+
+npm install express node-fetch
+
+
+5. Click Run
+
+
