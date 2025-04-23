@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "./SovranWealthFund.sol";
+import "./interfaces/ISovranWealthFund.sol";
 
 contract SWFIntegratedEngine {
     // Admin
@@ -163,8 +163,8 @@ contract SWFIntegratedEngine {
             rewardDebt[msg.sender] = 0;
             
             // Transfer rewards to user (requires contract to have minter role)
-            SovranWealthFund swfToken = SovranWealthFund(address(swfToken));
-            swfToken.mint(msg.sender, reward);
+            ISovranWealthFund swfTokenMinter = ISovranWealthFund(address(swfToken));
+            swfTokenMinter.mint(msg.sender, reward);
             emit Minted(msg.sender, reward);
         }
     }

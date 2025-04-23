@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./SovranWealthFund.sol";
+import "./interfaces/ISovranWealthFund.sol";
 
 /**
  * @title SoloMethodEngineV2
@@ -156,8 +156,8 @@ contract SoloMethodEngineV2 is Ownable {
             rewardDebt[msg.sender] = 0;
             
             // Transfer rewards to user (requires contract to have minter role)
-            SovranWealthFund swfToken = SovranWealthFund(address(stakingToken));
-            swfToken.mint(msg.sender, reward);
+            ISovranWealthFund swfTokenMinter = ISovranWealthFund(address(stakingToken));
+            swfTokenMinter.mint(msg.sender, reward);
             emit Minted(msg.sender, reward);
         }
     }
