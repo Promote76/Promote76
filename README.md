@@ -171,3 +171,10 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [OpenZeppelin](https://openzeppelin.com/) for security patterns and best practices
 - [Hardhat](https://hardhat.org/) for the development environment
 - [Polygon](https://polygon.technology/) for their scalable blockchain platform
+
+## About the Repository Owner
+
+- 👋 Hi, I'm @Promote76
+- 🌱 I'm currently working on blockchain development
+- 💞️ I'm looking to collaborate on DeFi and token projects
+- 📫 How to reach me: Through GitHub
