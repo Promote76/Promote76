@@ -1,13 +1,14 @@
 # Sovran Wealth Fund (SWF) Token Deployment Guide
 
-This guide provides instructions for deploying the Sovran Wealth Fund ERC20 token to the Polygon Mumbai testnet or other networks.
+This guide provides instructions for deploying the Sovran Wealth Fund ERC20 token to the Polygon Amoy testnet.
 
 ## Prerequisites
 
 - Node.js and npm installed
-- A wallet with some MATIC for Mumbai testnet (get from a faucet like https://mumbaifaucet.com/)
+- A wallet with some MATIC for Polygon Amoy testnet
 - Private key of the deployment wallet
-- RPC endpoint for the target network (e.g., from Infura, Alchemy, or a public endpoint)
+- Alchemy API key (optional, for better RPC endpoint)
+- Polygonscan API key (for contract verification)
 
 ## Setup Environment
 
@@ -21,6 +22,7 @@ This guide provides instructions for deploying the Sovran Wealth Fund ERC20 toke
    ```
    PRIVATE_KEY=your_private_key_here
    ALCHEMY_API_KEY=your_alchemy_api_key_here (if using Alchemy)
+   POLYGONSCAN_API_KEY=your_polygonscan_api_key_here
    ```
 
 ## Contract Details
@@ -35,71 +37,42 @@ The `SovranWealthFund` token has the following features:
 - Initial minters:
   - The deployer of the contract (msg.sender)
   - The hardcoded address: `0x2A5269E92C48829fdF21D8892c23E894B11D15e3`
+- Pausable functionality (owner can pause all token transfers)
+- Burn functionality (any token holder can burn their own tokens)
 
 ## Deployment Steps
 
-### 1. Configure the target network
+### 1. Polygon Amoy Testnet Configuration
 
-Adjust the network configuration in `hardhat.config.js` as needed. For example, to use Alchemy for Mumbai:
-
-```javascript
-mumbai: {
-  url: `https://polygon-mumbai.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
-  chainId: 80001,
-  accounts: [process.env.PRIVATE_KEY],
-  timeout: 60000,
-  gasMultiplier: 1.5
-}
-```
-
-Or to use a public RPC endpoint:
+The project is already configured for Polygon Amoy testnet in `hardhat.config.js`:
 
 ```javascript
-mumbai: {
-  url: "https://rpc-mumbai.maticvigil.com",
-  chainId: 80001,
-  accounts: [process.env.PRIVATE_KEY],
-  timeout: 60000,
-  gasMultiplier: 1.5
+amoy: {
+  url: "https://rpc-amoy.polygon.technology", // Amoy RPC endpoint
+  chainId: 80002, // Amoy chain ID
+  accounts: [process.env.PRIVATE_KEY], // Private key from .env file
+  timeout: 60000, // Increase timeout to 60 seconds
+  gasMultiplier: 1.5 // Increase gas by 50% to avoid underpriced transactions
 }
 ```
 
 ### 2. Deploy the contract
 
-Run the deployment script for your target network:
+Run the deployment script for the Amoy network:
 
 ```bash
-npx hardhat run scripts/deploy.js --network mumbai
+npx hardhat run scripts/deploy.js --network amoy
 ```
 
-### 3. Verify the contract (optional)
+### 3. Verify the contract on Polygonscan
 
-For Polygon Mumbai, you can verify your contract on PolygonScan by using Hardhat's verify plugin.
-
-First, install the plugin:
+The project is already configured for verification on Amoy Polygonscan:
 
 ```bash
-npm install --save-dev @nomiclabs/hardhat-etherscan
+npx hardhat verify --network amoy YOUR_DEPLOYED_CONTRACT_ADDRESS
 ```
 
-Update `hardhat.config.js` to include the plugin and your PolygonScan API key:
-
-```javascript
-require("@nomiclabs/hardhat-etherscan");
-
-// In the module.exports object:
-etherscan: {
-  apiKey: {
-    polygonMumbai: "YOUR_POLYGONSCAN_API_KEY"
-  }
-}
-```
-
-Then run:
-
-```bash
-npx hardhat verify --network mumbai YOUR_DEPLOYED_CONTRACT_ADDRESS
-```
+Replace `YOUR_DEPLOYED_CONTRACT_ADDRESS` with the address printed in the console after deployment.
 
 ## Using the Deployed Token
 

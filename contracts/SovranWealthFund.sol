@@ -3,27 +3,39 @@ pragma solidity ^0.8.20;
 
 import "@thirdweb-dev/contracts/base/ERC20Base.sol";
 import "@thirdweb-dev/contracts/extension/PermissionsEnumerable.sol";
-import "@openzeppelin/contracts/security/Pausable.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
  * @title Sovran Wealth Fund
- * @dev ERC20 token with permission-based minting capabilities, pausability, and burn functions
+ * @dev ERC20 token with permission-based minting capabilities, burn functions, and pausability
  */
-contract SovranWealthFund is ERC20Base, PermissionsEnumerable, Pausable, Ownable {
+contract SovranWealthFund is ERC20Base, PermissionsEnumerable {
     // Define the minter role
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+    
+    // Pausable state
+    bool private _paused;
+    
+    // Events for pausing/unpausing
+    event Paused(address account);
+    event Unpaused(address account);
 
     /**
      * @dev Constructor initializes the token with name, symbol, and sets up roles
      */
     constructor()
-        ERC20Base("Sovran Wealth Fund", "SWF", msg.sender)
+        ERC20Base(msg.sender, "Sovran Wealth Fund", "SWF")
     {
         // Grant the MINTER_ROLE to the contract owner (msg.sender) and the hardcoded address
         _setupRole(MINTER_ROLE, msg.sender);
         _setupRole(MINTER_ROLE, 0x2A5269E92C48829fdF21D8892c23E894B11D15e3);
-        _transferOwnership(msg.sender);
+        _paused = false;
+    }
+    
+    /**
+     * @dev Returns true if the contract is paused, and false otherwise.
+     */
+    function paused() public view returns (bool) {
+        return _paused;
     }
 
     /**
@@ -31,7 +43,8 @@ contract SovranWealthFund is ERC20Base, PermissionsEnumerable, Pausable, Ownable
      * Only callable by the contract owner
      */
     function pause() public onlyOwner {
-        _pause();
+        _paused = true;
+        emit Paused(msg.sender);
     }
 
     /**
@@ -39,7 +52,8 @@ contract SovranWealthFund is ERC20Base, PermissionsEnumerable, Pausable, Ownable
      * Only callable by the contract owner
      */
     function unpause() public onlyOwner {
-        _unpause();
+        _paused = false;
+        emit Unpaused(msg.sender);
     }
 
     /**
@@ -57,7 +71,7 @@ contract SovranWealthFund is ERC20Base, PermissionsEnumerable, Pausable, Ownable
      * @param amount The amount of tokens to burn
      * Any token holder can burn their own tokens
      */
-    function burn(uint256 amount) public {
+    function burn(uint256 amount) public override {
         _burn(msg.sender, amount);
     }
 
@@ -69,7 +83,7 @@ contract SovranWealthFund is ERC20Base, PermissionsEnumerable, Pausable, Ownable
         internal
         override
     {
-        require(!paused(), "Token transfers are paused");
+        require(!_paused, "Token transfers are paused");
         super._beforeTokenTransfer(from, to, amount);
     }
 }

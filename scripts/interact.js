@@ -1,10 +1,11 @@
 // Interaction script for Sovran Wealth Fund token
 // Use this script to interact with your deployed token
+const { ethers } = require("hardhat");
 
 async function main() {
   try {
     // Replace with your deployed contract address
-    const contractAddress = "YOUR_DEPLOYED_CONTRACT_ADDRESS";
+    const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
     
     // Get the account that will interact with the contract
     const [deployer, user1, user2] = await ethers.getSigners();

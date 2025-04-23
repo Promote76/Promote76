@@ -1,4 +1,5 @@
 // Test script for Sovran Wealth Fund token
+const { ethers } = require("hardhat");
 
 async function main() {
   try {
