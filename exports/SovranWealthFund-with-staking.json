@@ -38,7 +38,7 @@
     "etherscan": "https://polygonscan.com/address/0x15AD65Fb62CD9147Aa4443dA89828A693228b5F7",
     "github": ""
   },
-  "timestamp": "2025-04-23T08:07:49.928Z",
+  "timestamp": "2025-04-23T08:30:36.652Z",
   "staking": {
     "engine": "SoloMethodEngine",
     "engineAddress": "Enter your SoloMethodEngine address here",
@@ -54,5 +54,5 @@
     ],
     "rewardPeriod": "30 days"
   },
-  "lastUpdated": "2025-04-23T08:07:49.928Z"
+  "lastUpdated": "2025-04-23T08:30:36.653Z"
 }

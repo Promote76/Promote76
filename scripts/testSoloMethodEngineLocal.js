@@ -17,7 +17,8 @@ async function main() {
     // Deploy the SWF token contract
     console.log("Deploying SovranWealthFund token...");
     const SovranWealthFund = await hre.ethers.getContractFactory("contracts/SovranWealthEngine.sol:SovranWealthFund");
-    const swf = await SovranWealthFund.deploy();
+    // Use the deployer as both mainDistributor and treasury for testing
+    const swf = await SovranWealthFund.deploy(deployer.address, deployer.address);
     await swf.deployed();
     console.log(`SWF token deployed to: ${swf.address}`);
     

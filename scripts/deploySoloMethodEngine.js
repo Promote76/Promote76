@@ -9,6 +9,10 @@ async function main() {
     // Get the SWF token contract address
     const swfAddress = process.env.SWF_CONTRACT_ADDRESS || "0x15AD65Fb62CD9147Aa4443dA89828A693228b5F7";
     
+    // Main distributor and treasury addresses as defined in the extracted ZIP
+    const mainDistributor = "0xCe36333A88c2EA01f28f63131fA7dfa80AD021F6";
+    const treasury = "0x26A8401287cE33CC4aeb5a106cd6D282a9C2f51d";
+    
     console.log("=== Deploying SoloMethodEngine Contract ===");
     console.log(`SWF Token Address: ${swfAddress}`);
     

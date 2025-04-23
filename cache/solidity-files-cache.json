@@ -1207,8 +1207,8 @@
       ]
     },
     "/home/runner/workspace/contracts/SovranWealthEngine.sol": {
-      "lastModificationDate": 1745395359584,
-      "contentHash": "c0d18c3ed1d79939de3cedb1e94101a9",
+      "lastModificationDate": 1745396886742,
+      "contentHash": "4a5753e7c4027a3f243ec98eda663a77",
       "sourceName": "contracts/SovranWealthEngine.sol",
       "solcConfig": {
         "version": "0.8.20",

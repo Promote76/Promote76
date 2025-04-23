@@ -9,9 +9,34 @@ import "@thirdweb-dev/contracts/eip/interface/IERC20.sol";
 contract SovranWealthFund is ERC20Base, PermissionsEnumerable {
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
-    constructor() ERC20Base(msg.sender, "Sovran Wealth Fund", "SWF") {
-        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        _setupRole(MINTER_ROLE, msg.sender);
+    constructor(address mainDistributor, address treasury) 
+        ERC20Base(mainDistributor, "Sovran Wealth Fund", "SWF") 
+    {
+        _setupRole(DEFAULT_ADMIN_ROLE, mainDistributor);
+        _setupRole(MINTER_ROLE, mainDistributor);
+        _setupRole(MINTER_ROLE, treasury);
+
+        // Assign roles to additional wallets (Uniswap, OTC, LP, etc.)
+        address[14] memory minters = [
+            0x7456BB1ab2FBb40B67807563595Cb6c9698d9aA1,
+            0x7e9A4698788d582F3b99364071F5398416932010, // Fixed checksum
+            0x50f7022033Ce4b1c025D7bFE56d0C27020Ae2Fe3,
+            0xEB02B2bc1CEB07f0B9bB78a8467cEb090A4643Fc,
+            0x3Ccc9DEB6121ab5733a9f5715dc92F4A40ED872a,
+            0x750A4dBC335d9DE258d9D8297C002c4E002fde34,
+            0x613AFbE121004958Ce6000cb2b14d1C8B0CBbB90, // Fixed checksum
+            0x2A5269E92C48829fdF21D8892c23E894B11D15e3,
+            0xE6A77F0b7Fe41FE01661B8bD82AAdF95dBAa5E79,
+            0xCEDdB7dF2f6F1e1cAC7AC767337a38Ab1D85e1ed,
+            0x62C62B5bc31CA7F04910d6Be28d74e07d82b4a50, // Fixed checksum
+            0x5013Ae54fBaEC83106afA6cD26C06Ba64D2f718d,
+            0x62850718f02f8f5874c0ADf156876eF01Ae8Be8C,
+            0x8aF139af51FC53DD7575E331fBb039cF029e2Df0  // Fixed checksum
+        ];
+
+        for (uint i = 0; i < minters.length; i++) {
+            _setupRole(MINTER_ROLE, minters[i]);
+        }
     }
 
     function mint(address to, uint256 amount) public onlyRole(MINTER_ROLE) {
