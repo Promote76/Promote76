@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sovran Wealth Fund</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+                sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background-color: #f9fafb;
+            color: #1f2937;
+        }
+
+        .app {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .app-header {
+            background-color: #1a365d;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .app-header h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
+
+        .connect-button {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .connect-button:hover {
+            background-color: #2563eb;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            color: #1e3a8a;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+
+        .welcome-message {
+            text-align: center;
+            padding: 40px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .app-footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <header class="app-header">
+            <h1>Sovran Wealth Fund</h1>
+            <p>Advanced Token Staking & Vault System</p>
+            <button class="connect-button" id="connectBtn">Connect Wallet</button>
+        </header>
+
+        <div class="welcome-message">
+            <h2>Welcome to Sovran Wealth Fund</h2>
+            <p>This is a simplified version of the SWF dashboard due to CSS configuration issues.</p>
+            <p>The complete version includes:</p>
+            <ul style="text-align: left; display: inline-block;">
+                <li>SWF Token Management</li>
+                <li>Dynamic APR Staking</li>
+                <li>Basket Vault Integration</li>
+                <li>Role-Based Token Distribution</li>
+                <li>Interactive Charts & Visualizations</li>
+            </ul>
+            <p>To connect to the blockchain, click the Connect Wallet button above.</p>
+        </div>
+
+        <div class="dashboard" style="display: none;" id="dashboard">
+            <div class="card">
+                <h2>SWF Basket Vault</h2>
+                <div>
+                    <p>Total Deposited: <span id="totalDeposited">0</span> SWF</p>
+                    <p>Your Deposit: <span id="yourDeposit">0</span> SWF</p>
+                    <p>Available Balance: <span id="availableBalance">0</span> SWF</p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>SWF Staking</h2>
+                <div>
+                    <p>Current APR: <span id="currentAPR">20</span>%</p>
+                    <p>Total Staked: <span id="totalStaked">0</span> SWF</p>
+                    <p>Your Staked: <span id="yourStaked">0</span> SWF</p>
+                    <p>Pending Rewards: <span id="pendingRewards">0</span> SWF</p>
+                </div>
+            </div>
+        </div>
+        
+        <footer class="app-footer">
+            <p>© 2025 Sovran Wealth Fund. All rights reserved.</p>
+            <p>Deployed on Polygon Network</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const connectBtn = document.getElementById('connectBtn');
+            const dashboard = document.getElementById('dashboard');
+            const welcomeMessage = document.querySelector('.welcome-message');
+            
+            connectBtn.addEventListener('click', async () => {
+                if (window.ethereum) {
+                    try {
+                        // Request account access
+                        const accounts = await window.ethereum.requestAccounts();
+                        const account = accounts[0];
+                        
+                        // Update UI to show connected state
+                        connectBtn.textContent = `Connected: ${account.substring(0, 6)}...${account.substring(account.length - 4)}`;
+                        welcomeMessage.style.display = 'none';
+                        dashboard.style.display = 'grid';
+                        
+                        // Here you would normally connect to contracts and fetch data
+                        console.log('Connected to wallet:', account);
+                    } catch (error) {
+                        console.error('Failed to connect wallet:', error);
+                        alert('Failed to connect wallet. Please try again.');
+                    }
+                } else {
+                    alert('Please install MetaMask or another Ethereum wallet to use this application.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

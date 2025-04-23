@@ -122,6 +122,43 @@ export function getContractAddresses(chainId) {
   }
 }
 
+// Transaction types for the transaction history component
+export const TX_TYPES = {
+  DEPOSIT: "Deposit",
+  WITHDRAW: "Withdraw",
+  STAKE: "Stake",
+  UNSTAKE: "Unstake",
+  CLAIM_REWARDS: "Claim Rewards",
+  APPROVE: "Approve",
+  TRANSFER: "Transfer"
+};
+
+// Transaction status types
+export const TX_STATUS = {
+  PENDING: "pending",
+  SUCCESS: "success",
+  FAILED: "failed"
+};
+
+// Error types for the error handler component
+export const ERROR_TYPES = {
+  WALLET_CONNECTION: "wallet_connection",
+  INSUFFICIENT_FUNDS: "insufficient_funds",
+  TRANSACTION_REJECTED: "transaction_rejected",
+  CONTRACT_ERROR: "contract_error",
+  NETWORK_ERROR: "network_error",
+  APPROVAL_ERROR: "approval_error",
+  UNKNOWN_ERROR: "unknown_error"
+};
+
+// APR thresholds and ranges
+export const APR_CONFIG = {
+  LOW_THRESHOLD: 10000, // 10,000 SWF
+  HIGH_THRESHOLD: 100000, // 100,000 SWF
+  MIN_APR: 10, // 10%
+  MAX_APR: 30 // 30%
+};
+
 // Time-related constants
 export const SECONDS_IN_YEAR = 31536000; // 365 days
 export const BPS_DIVISOR = 10000; // Basis points divisor (100.00%)

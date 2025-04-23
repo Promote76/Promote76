@@ -20,6 +20,10 @@ args = "check_dependencies"
 task = "workflow.run"
 args = "Hardhat Local Node"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Static Frontend"
+
 [[workflows.workflow]]
 name = "check_dependencies"
 author = "agent"
@@ -48,8 +52,27 @@ task = "packager.installForAll"
 task = "shell.exec"
 args = "npx hardhat node"
 
+[[workflows.workflow]]
+name = "Static Frontend"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd frontend && npx serve -s public -l 5000"
+waitForPort = 5000
+
 [deployment]
 run = ["sh", "-c", "npm install --save-dev hardhat @nomiclabs/hardhat-ethers ethers@^5.0.0 @thirdweb-dev/contracts && npx hardhat run scripts/deploy.js --network mumbai"]
+
+[[ports]]
+localPort = 5000
+externalPort = 5000
 
 [[ports]]
 localPort = 8545

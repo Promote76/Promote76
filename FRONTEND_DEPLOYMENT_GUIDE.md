@@ -2,6 +2,19 @@
 
 This guide provides step-by-step instructions for deploying the Sovran Wealth Fund frontend application.
 
+## Development Phases
+
+The frontend development is organized into several phases as outlined in the `DEPLOYMENT_PHASES.md` document:
+
+1. **Phase 1**: Core Components & Wallet Integration (Completed)
+2. **Phase 2**: Basic Transaction Functionality (Completed)
+3. **Phase 3**: Enhanced UI Components (In Progress)
+4. **Phase 4**: Advanced User Features (Planned)
+5. **Phase 5**: Mainnet Deployment & Production Optimizations (Planned)
+6. **Phase 6**: Extended Ecosystem Integration (Future Consideration)
+
+Each phase builds upon the previous one and introduces new features and improvements.
+
 ## Development Environment Setup
 
 1. **Install Dependencies**
@@ -144,6 +157,63 @@ If contract addresses change:
 1. Update the addresses in the environment variables
 2. Rebuild and redeploy the application
 
+## New Components in Phase 3
+
+Phase 3 introduces several enhanced UI components:
+
+### Transaction History Component
+
+The Transaction History component (`TransactionHistory.jsx`) provides:
+- A chronological view of user transactions (newest first)
+- Visual differentiation between transaction types with color-coded badges
+- Transaction status indicators
+- Links to block explorer for each transaction
+- Amount and timestamp information
+- Empty state display when no transactions exist
+
+### APR Visualization Component
+
+The APR Visualization component (`APRVisualization.jsx`) enables:
+- Visual representation of how vault deposits affect APR
+- Interactive simulation of APR changes based on deposit amounts
+- Current APR indicator
+- Deposit threshold markers
+- Comparison between current and simulated APRs
+
+### Transaction Modal Component
+
+The Transaction Modal component (`TransactionModal.jsx`) provides:
+- Contextual modal displays for transaction states (confirm, pending, success, error)
+- Transaction hash display with block explorer link
+- Appropriate action buttons based on transaction state
+- Animated transitions between states
+
+### Error Handler Component
+
+The Error Handler component (`ErrorHandler.jsx`) offers:
+- Standardized error categorization
+- User-friendly error messages
+- Suggested solutions for common issues
+- Retry functionality where applicable
+
+### Loading Indicator Component
+
+The Loading Indicator component (`LoadingIndicator.jsx`) includes:
+- Multiple loading indicator styles (spinner, dots, progress, pulse, skeleton)
+- Various size options
+- Optional text messages
+- Full-screen or inline display options
+
+## Enhanced Dashboard Integration
+
+The Enhanced Dashboard (`EnhancedDashboard.jsx`) integrates all these components into a cohesive experience:
+- Wallet connection and network management
+- Contract interaction via the VaultDashboard and StakingDashboard
+- Transaction tracking and history display
+- APR visualization and simulation
+- Enhanced error handling
+- Improved loading states
+
 ## Troubleshooting
 
 ### Common Issues
@@ -151,17 +221,24 @@ If contract addresses change:
 1. **Wallet Connection Problems**
    - Ensure MetaMask or other wallet is installed and unlocked
    - Check console for connection errors
+   - Verify the browser supports Web3 wallet connections
+   - Try using the "Switch to Enhanced UI" option if basic UI is not connecting
 
 2. **Contract Interaction Failures**
    - Verify the contract addresses in the environment variables
    - Check that the user has sufficient token balance and network currency (MATIC)
    - Verify ABI compatibility with deployed contracts
+   - Examine the transaction modal for specific error messages
+   - Check the ErrorHandler component for suggested solutions
 
 3. **Network Issues**
    - Ensure the user is connected to a supported network
    - Check RPC endpoint availability
+   - Try alternative RPC endpoints if Polygon nodes are congested
+   - Verify the network switching functionality works as expected
 
 4. **UI Rendering Problems**
    - Clear browser cache
    - Update to the latest version of the application
    - Check browser console for JavaScript errors
+   - Try toggling between Basic and Enhanced UI modes
