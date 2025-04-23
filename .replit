@@ -28,6 +28,14 @@ args = "SWF Database API"
 task = "workflow.run"
 args = "Static Dashboard"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Simple Dashboard"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Static HTML Dashboard"
+
 [[workflows.workflow]]
 name = "check_dependencies"
 author = "agent"
@@ -55,6 +63,7 @@ task = "packager.installForAll"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npx hardhat node"
+waitForPort = 8545
 
 [[workflows.workflow]]
 name = "SWF Database API"
@@ -69,6 +78,7 @@ task = "packager.installForAll"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "node server.js"
+waitForPort = 5001
 
 [[workflows.workflow]]
 name = "Static Dashboard"
@@ -83,6 +93,36 @@ task = "packager.installForAll"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "node static-dashboard.js"
+waitForPort = 5000
+
+[[workflows.workflow]]
+name = "Simple Dashboard"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node simple-server.js"
+waitForPort = 5000
+
+[[workflows.workflow]]
+name = "Static HTML Dashboard"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node static-html-server.js"
 waitForPort = 5000
 
 [deployment]

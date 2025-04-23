@@ -1,20 +1,21 @@
 /**
- * Static Dashboard Generator for SWF
+ * SWF Database Dashboard
  * 
- * This script generates a static HTML dashboard by pre-fetching data from the API
- * and embedding it directly in the HTML. This approach eliminates JavaScript errors
- * in the browser.
+ * This is a simple Express server that directly queries the database
+ * and presents the information in a static HTML page.
  */
 
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
-const axios = require('axios');
+const { Pool } = require('pg');
 const app = express();
 const PORT = 5000;
 
-// API base URL for server-side requests
-const API_SERVER_URL = 'http://0.0.0.0:5001/api';
+// Initialize PostgreSQL client
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
 
 // Helper function to truncate addresses
 function truncateAddress(address) {
@@ -42,41 +43,29 @@ function formatDate(dateString) {
   return date.toLocaleString();
 }
 
-// Generate static dashboard HTML
+// Generate a static dashboard HTML with data from database
 async function generateDashboard() {
+  let client;
+  
   try {
-    console.log('Generating static dashboard...');
+    console.log('Generating static dashboard from database...');
     
-    // Fetch data from API
-    let vaults = [];
-    let roles = [];
-    let transactions = [];
-    let apiStatus = 'Disconnected';
+    client = await pool.connect();
     
-    try {
-      console.log('Fetching API health...');
-      const healthResponse = await axios.get(`${API_SERVER_URL}/health`);
-      if (healthResponse.data.status === 'OK') {
-        apiStatus = 'Connected';
-        
-        // Fetch vaults
-        console.log('Fetching vaults...');
-        const vaultsResponse = await axios.get(`${API_SERVER_URL}/vaults`);
-        vaults = vaultsResponse.data;
-        
-        // Fetch roles
-        console.log('Fetching roles...');
-        const rolesResponse = await axios.get(`${API_SERVER_URL}/roles`);
-        roles = rolesResponse.data;
-        
-        // Fetch transactions for a known address
-        console.log('Fetching transactions...');
-        const txResponse = await axios.get(`${API_SERVER_URL}/transactions/address/0xCe36333A88c2EA01f28f63131fA7dfa80AD021F6`);
-        transactions = txResponse.data;
-      }
-    } catch (error) {
-      console.error('Error fetching data from API:', error.message);
-    }
+    // Get vaults data
+    console.log('Fetching vaults from database...');
+    const vaultsResult = await client.query('SELECT * FROM vaults');
+    const vaults = vaultsResult.rows;
+    
+    // Get roles data
+    console.log('Fetching roles from database...');
+    const rolesResult = await client.query('SELECT * FROM role_allocations ORDER BY id DESC');
+    const roles = rolesResult.rows;
+    
+    // Get transactions data
+    console.log('Fetching transactions from database...');
+    const txsResult = await client.query('SELECT * FROM transactions ORDER BY timestamp DESC LIMIT 10');
+    const transactions = txsResult.rows;
     
     // Generate unique roles (keeping only highest ID for each role name)
     const uniqueRoles = {};
@@ -113,7 +102,7 @@ async function generateDashboard() {
         `;
       });
     } else {
-      vaultsHTML = '<div class="card"><p>No vaults found or API connection error.</p></div>';
+      vaultsHTML = '<div class="card"><p>No vaults found in database.</p></div>';
     }
     
     // Generate roles HTML
@@ -134,7 +123,7 @@ async function generateDashboard() {
         `;
       });
     } else {
-      rolesHTML = '<p>No role allocations found or API connection error.</p>';
+      rolesHTML = '<p>No role allocations found in database.</p>';
     }
     
     // Generate transactions HTML
@@ -160,7 +149,7 @@ async function generateDashboard() {
         `;
       });
     } else {
-      transactionsHTML = '<p>No transactions found or API connection error.</p>';
+      transactionsHTML = '<p>No transactions found in database.</p>';
     }
     
     // Generate complete HTML
@@ -169,7 +158,7 @@ async function generateDashboard() {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SWF Static Dashboard</title>
+  <title>SWF Database Dashboard</title>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -192,20 +181,14 @@ async function generateDashboard() {
       padding-bottom: 15px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
-    .api-status {
+    .db-status {
       display: inline-block;
       padding: 8px 16px;
       border-radius: 20px;
       font-size: 14px;
       font-weight: bold;
-    }
-    .api-status.connected {
       background-color: rgba(16, 185, 129, 0.2);
       color: #10b981;
-    }
-    .api-status.disconnected {
-      background-color: rgba(239, 68, 68, 0.2);
-      color: #ef4444;
     }
     .card {
       background-color: rgba(255, 255, 255, 0.05);
@@ -373,13 +356,18 @@ async function generateDashboard() {
       padding-top: 20px;
       border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
+    .update-info {
+      font-size: 0.8rem;
+      margin-top: 5px;
+      color: #9ca3af;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
       <h1>Sovran Wealth Fund</h1>
-      <div class="api-status ${apiStatus.toLowerCase()}">${apiStatus}</div>
+      <div class="db-status">Database Connected</div>
     </header>
     
     <div class="token-info">
@@ -407,35 +395,64 @@ async function generateDashboard() {
     </div>
     
     <footer>
-      <p>Sovran Wealth Fund &copy; 2025 - Data refreshed on: ${new Date().toLocaleString()}</p>
+      <p>Sovran Wealth Fund &copy; 2025 - Data pulled from PostgreSQL database on: ${new Date().toLocaleString()}</p>
+      <p class="update-info">The dashboard refreshes automatically when accessed. No client-side JavaScript needed.</p>
     </footer>
   </div>
 </body>
 </html>`;
     
+    // Create the public directory if it doesn't exist
+    const publicDir = path.join(__dirname, 'frontend/public');
+    if (!fs.existsSync(publicDir)) {
+      fs.mkdirSync(publicDir, { recursive: true });
+    }
+    
     // Write the HTML to a file
-    fs.writeFileSync(path.join(__dirname, 'frontend/public/static-dashboard.html'), html);
-    console.log('Static dashboard generated successfully');
+    fs.writeFileSync(path.join(publicDir, 'db-dashboard.html'), html);
+    console.log('Database dashboard generated successfully');
     return true;
   } catch (error) {
     console.error('Error generating dashboard:', error);
     return false;
+  } finally {
+    if (client) {
+      client.release();
+    }
   }
 }
 
-// Generate dashboard on server start
-generateDashboard().then(success => {
-  if (success) {
-    console.log('Dashboard is ready to be served');
-  } else {
-    console.error('Failed to generate dashboard');
+// Set up routes
+app.get('/', async (req, res) => {
+  try {
+    // Generate a fresh dashboard
+    await generateDashboard();
+    
+    // Redirect to the dashboard
+    res.redirect('/db-dashboard.html');
+  } catch (error) {
+    console.error('Error generating dashboard for request:', error);
+    res.status(500).send('Error generating dashboard');
   }
 });
 
-// Set up the Express server
+// Set up static file serving
 app.use(express.static(path.join(__dirname, 'frontend/public')));
 
 // Start the server
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Frontend server running on http://0.0.0.0:${PORT}`);
+  console.log(`Database Dashboard server running on http://0.0.0.0:${PORT}`);
+  
+  // Generate the initial dashboard on startup
+  generateDashboard()
+    .then(success => {
+      if (success) {
+        console.log('Initial dashboard generated successfully');
+      } else {
+        console.error('Failed to generate initial dashboard');
+      }
+    })
+    .catch(err => {
+      console.error('Error generating initial dashboard:', err);
+    });
 });
