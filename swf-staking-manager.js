@@ -11,7 +11,10 @@ const engineAbi = [
   "function calculateRewards(address user) public view returns (uint256)",
   "function getWalletBreakdown(address user) external view returns (tuple(uint8 role, uint256 balance)[16])",
   "function getTotalStaked(address user) external view returns (uint256)",
-  "function getPendingRewards(address user) external view returns (uint256)"
+  "function getPendingRewards(address user) external view returns (uint256)",
+  "function getCurrentAPR() external view returns (uint256)",
+  "function setAPR(uint256 _newAprBps) external",
+  "function admin() external view returns (address)"
 ];
 
 // Load ABI from the compile output (this is a simplified ERC20 ABI)
@@ -97,6 +100,10 @@ async function getStakingInfo() {
     const stakedAmount = await soloMethodEngine.getTotalStaked(signerAddress);
     const formattedStaked = ethers.utils.formatUnits(stakedAmount, decimals);
     
+    // Get current APR
+    const currentAPR = await soloMethodEngine.getCurrentAPR();
+    const aprPercentage = currentAPR.toNumber() / 100;
+    
     // Get pending rewards
     const pendingRewards = await soloMethodEngine.getPendingRewards(signerAddress);
     const formattedRewards = ethers.utils.formatUnits(pendingRewards, decimals);
@@ -104,11 +111,19 @@ async function getStakingInfo() {
     // Get wallet breakdown
     const wallets = await soloMethodEngine.getWalletBreakdown(signerAddress);
     
+    // Get admin address
+    const adminAddress = await soloMethodEngine.admin();
+    const isAdmin = signerAddress.toLowerCase() === adminAddress.toLowerCase();
+    
     console.log(`\n=== Staking Information for ${signerAddress} ===`);
     console.log(`Token: ${name} (${symbol})`);
     console.log(`Wallet balance: ${formattedBalance} ${symbol}`);
     console.log(`Total staked: ${formattedStaked} ${symbol}`);
+    console.log(`Current APR: ${aprPercentage}%`);
     console.log(`Pending rewards: ${formattedRewards} ${symbol}`);
+    if (isAdmin) {
+      console.log(`Admin Status: ✅ You are the contract admin`);
+    }
     
     if (stakedAmount.gt(0)) {
       const WALLET_ROLES = ["BUYER", "HOLDER", "STAKER", "LIQUIDITY", "TRACKER"];
@@ -129,7 +144,9 @@ async function getStakingInfo() {
     return {
       balance: formattedBalance,
       staked: formattedStaked,
-      rewards: formattedRewards
+      rewards: formattedRewards,
+      apr: aprPercentage,
+      isAdmin
     };
     
   } catch (error) {
@@ -326,6 +343,58 @@ async function getOptimalGasPrice() {
 }
 
 /**
+ * Set a new APR for the staking contract (admin only)
+ * @param {string} newAprPercentage The new APR in percentage (e.g., "20" for 20%)
+ */
+async function setAPR(newAprPercentage) {
+  try {
+    const { soloMethodEngine, signerAddress } = await connect();
+    
+    // Check if caller is admin
+    const adminAddress = await soloMethodEngine.admin();
+    if (signerAddress.toLowerCase() !== adminAddress.toLowerCase()) {
+      throw new Error("Only the admin can set the APR rate");
+    }
+    
+    // Convert percentage to basis points (e.g., 20% = 2000 basis points)
+    const basisPoints = parseInt(newAprPercentage) * 100;
+    
+    // Validate the APR is within acceptable range
+    if (basisPoints <= 0 || basisPoints > 5000) {
+      throw new Error("APR must be between 0.01% and 50%");
+    }
+    
+    // Get gas parameters
+    const gasPrice = await getOptimalGasPrice();
+    
+    // Get current APR for comparison
+    const currentAPR = await soloMethodEngine.getCurrentAPR();
+    const currentPercentage = currentAPR.toNumber() / 100;
+    
+    console.log(`Changing APR from ${currentPercentage}% to ${newAprPercentage}% with gas price ${ethers.utils.formatUnits(gasPrice, 'gwei')} gwei...`);
+    
+    // Set the new APR
+    const tx = await soloMethodEngine.setAPR(
+      basisPoints,
+      { gasPrice, gasLimit: 200000 }
+    );
+    
+    console.log(`Transaction sent: ${tx.hash}`);
+    console.log(`Waiting for confirmation...`);
+    
+    await tx.wait();
+    console.log(`✅ APR updated successfully to ${newAprPercentage}%!`);
+    
+    // Show updated staking info
+    await getStakingInfo();
+    
+  } catch (error) {
+    console.error("Error setting APR:", error.message);
+    throw error;
+  }
+}
+
+/**
  * Process command line arguments and execute the appropriate function
  */
 async function main() {
@@ -342,6 +411,7 @@ async function main() {
       console.log("  stake <amount>            Stake tokens");
       console.log("  withdraw <amount>         Withdraw staked tokens");
       console.log("  claim                     Claim staking rewards");
+      console.log("  set-apr <percentage>      Set APR percentage (admin only)");
       return;
     }
     
@@ -379,6 +449,16 @@ async function main() {
         
       case "claim":
         await claimRewards();
+        break;
+      
+      case "set-apr":
+        if (!args[1]) {
+          console.log("Error: Missing APR percentage");
+          console.log("Usage: node swf-staking-manager.js set-apr <percentage>");
+          console.log("Example: node swf-staking-manager.js set-apr 20");
+          return;
+        }
+        await setAPR(args[1]);
         break;
         
       default:

@@ -78,6 +78,10 @@ async function main() {
       );
     });
     
+    // Check current APR
+    const currentAPR = await engine.getCurrentAPR();
+    console.log(`\nCurrent APR: ${currentAPR.toNumber() / 100}% (${currentAPR} basis points)`);
+    
     // Simulate time passing (for rewards)
     console.log("\nSimulating 30 days passing...");
     // Increase time by 30 days (in seconds)
@@ -98,6 +102,33 @@ async function main() {
       // Check user balance after claiming
       const newBalance = await swf.balanceOf(user1.address);
       console.log(`User1 new balance: ${hre.ethers.utils.formatEther(newBalance)} SWF`);
+    }
+    
+    // Test changing the APR
+    console.log("\nChanging APR from 25% to 20%...");
+    await engine.setAPR(2000); // 20%
+    const newAPR = await engine.getCurrentAPR();
+    console.log(`✅ New APR: ${newAPR.toNumber() / 100}% (${newAPR} basis points)`);
+    
+    // Simulate additional time passing with new APR
+    console.log("\nSimulating 15 more days with new APR...");
+    await hre.network.provider.send("evm_increaseTime", [15 * 24 * 60 * 60]);
+    await hre.network.provider.send("evm_mine");
+    console.log("⏱️ Time advanced by 15 more days");
+    
+    // Check pending rewards with new rate
+    const newPendingRewards = await engine.getPendingRewards(user1.address);
+    console.log(`Pending rewards with 20% APR: ${hre.ethers.utils.formatEther(newPendingRewards)} SWF`);
+    
+    // Claim rewards again
+    if (newPendingRewards.gt(0)) {
+      console.log("\nClaiming rewards with new APR...");
+      await engine.connect(user1).claimRewards();
+      console.log(`✅ Claimed ${hre.ethers.utils.formatEther(newPendingRewards)} SWF rewards`);
+      
+      // Check user balance after claiming
+      const finalBalance = await swf.balanceOf(user1.address);
+      console.log(`User1 final balance: ${hre.ethers.utils.formatEther(finalBalance)} SWF`);
     }
     
     // Withdraw tokens

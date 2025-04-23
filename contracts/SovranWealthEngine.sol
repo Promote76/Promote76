@@ -45,7 +45,7 @@ contract SovranWealthFund is ERC20Base, PermissionsEnumerable {
 }
 
 /// @title Solo Method Engine
-/// @notice Manages 16-role staking logic and tracks per-user wallet structure
+/// @notice Manages 16-role staking logic with dynamic APR
 contract SoloMethodEngine {
     IERC20 public swf;
     address public admin;
@@ -57,24 +57,49 @@ contract SoloMethodEngine {
         uint256 balance;
     }
 
+    // Wallet structure
     mapping(address => WalletInfo[16]) public userWallets;
     mapping(address => uint256) public stakedAmount;
     mapping(address => uint256) public lastRewardTime;
-    uint256 public constant REWARD_RATE = 5; // 5% APR
-    uint256 public constant REWARD_PERIOD = 30 days;
+    mapping(address => uint256) public rewardDebt;
+    
+    // Dynamic APR settings
+    uint256 public aprBasisPoints = 2500; // 25% APR (in basis points)
+    uint256 public constant BPS_DIVISOR = 10000;
+    uint256 public constant SECONDS_IN_YEAR = 31536000;
+    uint256 public constant MIN_STAKE_AMOUNT = 50 * 1e18; // 50 SWF minimum
     
     event Deposited(address indexed user, uint256 amount);
     event Withdrawn(address indexed user, uint256 amount);
     event Minted(address indexed user, uint256 reward);
+    event APRUpdated(uint256 oldAPR, uint256 newAPR);
 
     constructor(address _swfTokenAddress) {
         swf = IERC20(_swfTokenAddress);
         admin = msg.sender;
     }
+    
+    modifier onlyAdmin() {
+        require(msg.sender == admin, "Only admin can call");
+        _;
+    }
 
+    /// @notice Set a new APR value (in basis points)
+    /// @param _newAprBps The new APR in basis points (100 = 1%)
+    function setAPR(uint256 _newAprBps) external onlyAdmin {
+        require(_newAprBps <= 5000, "APR too high (max 50%)");
+        uint256 oldApr = aprBasisPoints;
+        aprBasisPoints = _newAprBps;
+        emit APRUpdated(oldApr, _newAprBps);
+    }
+
+    /// @notice Stake tokens and distribute them across 16 wallets
     function deposit(uint256 amount) external {
-        require(amount >= 50 * 1e18, "Minimum 50 SWF required");
+        require(amount >= MIN_STAKE_AMOUNT, "Minimum 50 SWF required");
         require(swf.transferFrom(msg.sender, address(this), amount), "Transfer failed");
+        
+        // Update rewards before changing stake
+        _updateRewards(msg.sender);
 
         // Distribute the amount across 16 wallets evenly
         for (uint8 i = 0; i < 16; i++) {
@@ -86,12 +111,13 @@ contract SoloMethodEngine {
         emit Deposited(msg.sender, amount);
     }
     
+    /// @notice Withdraw staked tokens
     function withdraw(uint256 amount) external {
         require(amount > 0, "Amount must be greater than 0");
         require(stakedAmount[msg.sender] >= amount, "Insufficient staked balance");
         
-        // Claim rewards first
-        claimRewards();
+        // Update rewards before changing stake
+        _updateRewards(msg.sender);
         
         // Update staked amount
         stakedAmount[msg.sender] -= amount;
@@ -115,27 +141,35 @@ contract SoloMethodEngine {
         emit Withdrawn(msg.sender, amount);
     }
     
+    /// @notice Update user's reward debt for precise tracking
+    function _updateRewards(address user) internal {
+        uint256 pending = calculateRewards(user);
+        rewardDebt[user] = pending;
+        lastRewardTime[user] = block.timestamp;
+    }
+    
+    /// @notice Calculate earned rewards with continuous compounding
     function calculateRewards(address user) public view returns (uint256) {
         if (stakedAmount[user] == 0 || lastRewardTime[user] == 0) {
-            return 0;
+            return rewardDebt[user];
         }
         
         uint256 timeElapsed = block.timestamp - lastRewardTime[user];
-        uint256 rewardPeriods = timeElapsed / REWARD_PERIOD;
         
-        if (rewardPeriods == 0) {
-            return 0;
-        }
+        // Calculate reward: staked * APR * (timeElapsed / SECONDS_IN_YEAR)
+        uint256 reward = (stakedAmount[user] * aprBasisPoints * timeElapsed) / 
+                        BPS_DIVISOR / SECONDS_IN_YEAR;
         
-        // Calculate reward: staked * rate * (timeElapsed / period)
-        uint256 reward = stakedAmount[user] * REWARD_RATE * rewardPeriods / 100;
-        return reward;
+        return reward + rewardDebt[user];
     }
     
+    /// @notice Claim accumulated rewards
     function claimRewards() public {
-        uint256 reward = calculateRewards(msg.sender);
+        _updateRewards(msg.sender);
+        uint256 reward = rewardDebt[msg.sender];
+        
         if (reward > 0) {
-            lastRewardTime[msg.sender] = block.timestamp;
+            rewardDebt[msg.sender] = 0;
             
             // Transfer rewards to user (requires contract to have minter role)
             SovranWealthFund swfToken = SovranWealthFund(address(swf));
@@ -144,15 +178,23 @@ contract SoloMethodEngine {
         }
     }
 
+    /// @notice Get the distribution of tokens across 16 wallets
     function getWalletBreakdown(address user) external view returns (WalletInfo[16] memory) {
         return userWallets[user];
     }
 
+    /// @notice Get total staked amount for a user
     function getTotalStaked(address user) external view returns (uint256) {
         return stakedAmount[user];
     }
     
+    /// @notice Get pending rewards for a user
     function getPendingRewards(address user) external view returns (uint256) {
         return calculateRewards(user);
+    }
+    
+    /// @notice Get current APR in percentage (25% = 2500 basis points)
+    function getCurrentAPR() external view returns (uint256) {
+        return aprBasisPoints;
     }
 }
