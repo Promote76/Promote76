@@ -1,63 +1,131 @@
 # Sovran Wealth Fund (SWF) Token
 
-A custom ERC20 token with permission-based minting capabilities designed to be deployed on the Polygon Mumbai testnet.
-
 ## Overview
 
-The Sovran Wealth Fund (SWF) token is an ERC20 token built using Hardhat and thirdweb's smart contract libraries. The token features role-based access control for minting operations, allowing only authorized addresses to create new tokens.
+The Sovran Wealth Fund (SWF) is an ERC20 token built on the Polygon blockchain using ThirdWeb's smart contract libraries. It features role-based minting permissions, pausable functionality, and burning capabilities.
+
+![Sovran Wealth Fund](generated-icon.png)
 
 ## Features
 
-- **Standard ERC20 Functionality**: Transfer, approve, and all standard ERC20 operations
-- **Permission-Based Minting**: Only addresses with the MINTER_ROLE can mint new tokens
-- **Role Management**: Grant and revoke roles to control who can mint tokens
-- **Dual Admin Setup**: Both the deployer and a hardcoded address have minting permissions
+- **Role-Based Minting**: Only addresses with the MINTER_ROLE can create new tokens
+- **Pausable Transfers**: The contract owner can pause and unpause token transfers
+- **Burning Capability**: Token holders can burn their own tokens
+- **Contract Metadata**: Customizable token name, symbol, and decimals
+- **Standard ERC20 Compatibility**: Works with all ERC20-compatible wallets and exchanges
 
-## Technical Specifications
+## Technical Details
 
-- **Name**: Sovran Wealth Fund
-- **Symbol**: SWF
-- **Decimals**: 18 (standard for ERC20 tokens)
-- **Solidity Version**: 0.8.20
-- **Framework**: Hardhat
-- **Libraries**: thirdweb contracts (ERC20Base, PermissionsEnumerable)
+- **Token Name**: Sovran Wealth Fund
+- **Token Symbol**: SWF
+- **Decimals**: 18
+- **Initial Supply**: 0 (all tokens are minted post-deployment)
+- **Network**: Polygon Amoy Testnet
+
+## Contract Structure
+
+The smart contract inherits from ThirdWeb's ERC20Base contract and implements:
+
+- Role-based access control for minting permissions
+- Pausable functionality for emergency situations
+- Burning capability for token holders
+- Metadata for the token name and symbol
 
 ## Project Structure
 
-- `contracts/`: Contains the Solidity smart contract files
-  - `SovranWealthFund.sol`: The main token contract
-- `scripts/`: Contains deployment and interaction scripts
-  - `deploy.js`: Script to deploy the token contract
-  - `test.js`: Script to test the token functionality
-  - `interact.js`: Script to interact with the deployed token
-- `hardhat.config.js`: Hardhat configuration file
+```
+sovran-wealth-fund/
+├── contracts/
+│   └── SovranWealthFund.sol    # Main token contract
+├── scripts/
+│   ├── deploy.js               # Local deployment script
+│   ├── deployAmoy.js           # Amoy testnet deployment script
+│   ├── deployAmoyMinimal.js    # Gas-optimized Amoy deployment
+│   ├── checkDeployment.js      # Check deployment status
+│   ├── mint.js                 # Mint new tokens
+│   ├── interact.js             # General contract interaction
+│   └── test*.js                # Various test scripts
+├── hardhat.config.js           # Hardhat configuration
+├── .env                        # Environment variables (create this)
+└── DEPLOYMENT_GUIDE.md         # Detailed deployment instructions
+```
 
-## Deployment
+## Getting Started
 
-For detailed deployment instructions, see [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md).
+### Prerequisites
+
+- Node.js and npm
+- Hardhat development environment
+- Polygon Amoy testnet account with POL tokens
+
+### Installation
+
+1. Clone this repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Create a `.env` file with your credentials:
+   ```
+   PRIVATE_KEY=your_wallet_private_key
+   ALCHEMY_API_KEY=your_alchemy_api_key
+   POLYGONSCAN_API_KEY=your_polygonscan_api_key
+   ```
+
+### Local Testing
+
+Run a local Hardhat node:
+```bash
+npx hardhat node
+```
+
+Deploy to the local network:
+```bash
+npx hardhat run scripts/deploy.js --network localhost
+```
+
+Run tests:
+```bash
+npx hardhat run scripts/fullTest.js --network localhost
+```
+
+### Testnet Deployment
+
+Deploy to Polygon Amoy testnet:
+```bash
+npx hardhat run scripts/deployAmoyMinimal.js --network amoy
+```
+
+Monitor deployment status:
+```bash
+npx hardhat run scripts/checkDeployment.js --network amoy
+```
 
 ## Usage
 
-After deploying the SWF token, you can:
+After deployment, you can:
 
-1. **Mint Tokens**: Only addresses with the MINTER_ROLE can create new tokens
-2. **Transfer Tokens**: Any token holder can transfer tokens to other addresses
-3. **Manage Minting Permissions**: The admin can grant or revoke the MINTER_ROLE
+1. Mint new tokens (if you have the MINTER_ROLE)
+2. Transfer tokens between accounts
+3. Pause/unpause all transfers (if you're the owner)
+4. Burn tokens
 
-## Security
+See the [Deployment Guide](DEPLOYMENT_GUIDE.md) for detailed instructions on interacting with the contract.
 
-- Role-based access control ensures only authorized addresses can mint new tokens
-- Built on proven, audited libraries from thirdweb
-- Follows Solidity best practices for secure token design
+## Security Features
 
-## Development
-
-To set up the development environment:
-
-1. Clone this repository
-2. Install dependencies: `npm install`
-3. Run tests on the local Hardhat network: `npx hardhat run scripts/test.js --network localhost`
+- Role-based access control for minting permissions
+- Only the contract owner can pause/unpause transfers
+- Token holders can only burn their own tokens
+- No backdoors or admin functions to manipulate balances
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgments
+
+- [ThirdWeb](https://thirdweb.com/) for their robust smart contract libraries
+- [OpenZeppelin](https://openzeppelin.com/) for security patterns and best practices
+- [Hardhat](https://hardhat.org/) for the development environment
+- [Polygon](https://polygon.technology/) for their scalable blockchain platform

@@ -1,139 +1,174 @@
-# Sovran Wealth Fund (SWF) Token Deployment Guide
+# Sovran Wealth Fund (SWF) Deployment Guide
 
-This guide provides instructions for deploying the Sovran Wealth Fund ERC20 token to the Polygon Amoy testnet.
+This guide provides instructions for deploying the Sovran Wealth Fund token to the Polygon Amoy testnet and interacting with it after deployment.
 
 ## Prerequisites
 
 - Node.js and npm installed
-- A wallet with some POL tokens for Polygon Amoy testnet
-- Private key of the deployment wallet
-- Alchemy API key (optional, for better RPC endpoint)
-- Polygonscan API key (for contract verification)
+- Hardhat development environment set up
+- MetaMask wallet with Polygon Amoy testnet configured
+- Small amount of Amoy POL tokens for gas (0.5 POL minimum)
 
-## Getting POL for Polygon Amoy Testnet
+## Environment Setup
 
-Before deploying, ensure your wallet has POL tokens on the Amoy testnet (POL is the new native token for Polygon networks, replacing MATIC):
+1. Create a `.env` file in the project root with the following contents:
 
-1. Visit the Polygon Amoy Faucet: https://amoy.polygon.technology/faucet
-2. Enter your wallet address
-3. Complete any verification steps
-4. Request POL tokens (may take a few minutes to arrive)
-5. Verify your balance by checking your address on Amoy Polygonscan: https://amoy.polygonscan.com/
+```
+PRIVATE_KEY=your_wallet_private_key
+ALCHEMY_API_KEY=your_alchemy_api_key
+POLYGONSCAN_API_KEY=your_polygonscan_api_key
+```
 
-## Setup Environment
-
-1. Clone this repository or download the files
 2. Install dependencies:
-   ```
-   npm install
-   ```
 
-3. Create a `.env` file in the root directory with the following variables:
-   ```
-   PRIVATE_KEY=your_private_key_here
-   ALCHEMY_API_KEY=your_alchemy_api_key_here (if using Alchemy)
-   POLYGONSCAN_API_KEY=your_polygonscan_api_key_here
-   ```
+```bash
+npm install
+```
 
-## Contract Details
+## Deployment Options
 
-The `SovranWealthFund` token has the following features:
-- Name: Sovran Wealth Fund
-- Symbol: SWF
-- Decimals: 18 (default for ERC20)
-- Permission-based minting through role-based access control
-- MINTER_ROLE hash: `0x9f2df0fed2c77648de5860a4cc508cd0818c85b8b8a1ab4ceeef8d981c8956a6`
-- Minting is restricted to addresses with the MINTER_ROLE
-- Initial minters:
-  - The deployer of the contract (msg.sender)
-  - The Treasury wallet: `0x26A8401287cE33CC4aeb5a106cd6D282a92Cf51d`
-- Pausable functionality (owner can pause all token transfers)
-- Burn functionality (any token holder can burn their own tokens)
+### Standard Deployment (Requires ~0.5 POL)
 
-## Deployment Steps
+```bash
+npx hardhat run scripts/deployAmoy.js --network amoy
+```
 
-### 1. Polygon Amoy Testnet Configuration
+### Minimal Gas Deployment (Requires ~0.11 POL)
 
-The project is already configured for Polygon Amoy testnet in `hardhat.config.js`:
+```bash
+npx hardhat run scripts/deployAmoyMinimal.js --network amoy
+```
+
+The deployment process may take several minutes on the Amoy testnet due to network congestion. Once completed, you'll receive a contract address.
+
+## Checking Deployment Status
+
+If your deployment transaction is taking a long time to complete, you can check its status:
+
+1. Add your transaction hash(es) to the `TX_HASHES` array in `scripts/checkDeployment.js`
+2. Run the check script:
+
+```bash
+npx hardhat run scripts/checkDeployment.js --network amoy
+```
+
+This will show the status of your transactions and, if successful, display information about the deployed contract.
+
+## Contract Verification
+
+After successful deployment, verify your contract on PolygonScan:
+
+```bash
+npx hardhat verify --network amoy YOUR_CONTRACT_ADDRESS
+```
+
+Replace `YOUR_CONTRACT_ADDRESS` with your actual deployed contract address.
+
+## Token Features and Interaction
+
+### Minting New Tokens
+
+Only addresses with the `MINTER_ROLE` can mint new tokens. The deployer address and the Treasury address (0x26A8401287cE33CC4aeb5a106cd6D282a92Cf51d) are granted this role by default.
 
 ```javascript
-amoy: {
-  url: `https://polygon-amoy.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`, // Alchemy Amoy RPC endpoint
-  chainId: 80002, // Amoy chain ID
-  accounts: [process.env.PRIVATE_KEY], // Private key from .env file
-  timeout: 60000, // Increase timeout to 60 seconds
-  gasMultiplier: 1.5 // Increase gas by 50% to avoid underpriced transactions
+// Example minting script (scripts/mint.js)
+async function main() {
+  const [deployer] = await ethers.getSigners();
+  const tokenAddress = "YOUR_CONTRACT_ADDRESS"; // Replace with actual address
+  const token = await ethers.getContractAt("SovranWealthFund", tokenAddress);
+  
+  const recipient = "RECIPIENT_ADDRESS"; // Address to receive tokens
+  const amount = ethers.utils.parseEther("1000"); // 1000 tokens (with 18 decimals)
+  
+  const tx = await token.mintTo(recipient, amount);
+  await tx.wait();
+  console.log(`Minted ${ethers.utils.formatEther(amount)} tokens to ${recipient}`);
 }
 ```
 
-### 2. Deploy the contract
-
-Run the deployment script for the Amoy network:
-
+Run with:
 ```bash
-npx hardhat run scripts/deploy.js --network amoy
+npx hardhat run scripts/mint.js --network amoy
 ```
 
-### 3. Verify the contract on Polygonscan
+### Pausing and Unpausing Transfers
 
-The project is already configured for verification on Amoy Polygonscan:
-
-```bash
-npx hardhat verify --network amoy YOUR_DEPLOYED_CONTRACT_ADDRESS
-```
-
-Replace `YOUR_DEPLOYED_CONTRACT_ADDRESS` with the address printed in the console after deployment.
-
-## Using the Deployed Token
-
-### Adding Minting Permissions
-
-To add a new address to the list of minters, you need to call the `grantRole` function with the MINTER_ROLE and the address:
+Only the contract owner can pause and unpause token transfers:
 
 ```javascript
-// In a script or hardhat console
-const sovranToken = await ethers.getContractAt("SovranWealthFund", "YOUR_DEPLOYED_CONTRACT_ADDRESS");
-const MINTER_ROLE = await sovranToken.MINTER_ROLE();
-await sovranToken.grantRole(MINTER_ROLE, "NEW_MINTER_ADDRESS");
+// Pause transfers
+const tx = await token.pause();
+await tx.wait();
+console.log("Token transfers paused");
+
+// Unpause transfers
+const tx = await token.unpause();
+await tx.wait();
+console.log("Token transfers unpaused");
 ```
 
-### Minting Tokens
+### Burning Tokens
 
-To mint new tokens, call the `mint` function:
+Any token holder can burn their own tokens:
 
 ```javascript
-// In a script or hardhat console
-const sovranToken = await ethers.getContractAt("SovranWealthFund", "YOUR_DEPLOYED_CONTRACT_ADDRESS");
-const amount = ethers.utils.parseEther("1000"); // 1000 tokens
-await sovranToken.mint("RECIPIENT_ADDRESS", amount);
+const amount = ethers.utils.parseEther("100"); // 100 tokens
+const tx = await token.burn(amount);
+await tx.wait();
+console.log(`Burned ${ethers.utils.formatEther(amount)} tokens`);
 ```
 
-### Checking Balances
-
-To check a user's balance:
+### Checking Token Details
 
 ```javascript
-// In a script or hardhat console
-const sovranToken = await ethers.getContractAt("SovranWealthFund", "YOUR_DEPLOYED_CONTRACT_ADDRESS");
-const balance = await sovranToken.balanceOf("USER_ADDRESS");
-console.log(`Balance: ${ethers.utils.formatEther(balance)} SWF`);
+const name = await token.name();
+const symbol = await token.symbol();
+const totalSupply = await token.totalSupply();
+const balance = await token.balanceOf("ADDRESS_TO_CHECK");
+
+console.log(`Name: ${name}`);
+console.log(`Symbol: ${symbol}`);
+console.log(`Total Supply: ${ethers.utils.formatEther(totalSupply)}`);
+console.log(`Balance: ${ethers.utils.formatEther(balance)}`);
 ```
 
-## Contract Architecture
+## Troubleshooting
 
-The Sovran Wealth Fund token extends two main thirdweb contracts:
+### Deployment Fails with "transaction underpriced"
 
-1. `ERC20Base`: Provides standard ERC20 token functionality
-2. `PermissionsEnumerable`: Provides role-based access control
+The Amoy testnet requires a minimum gas price of 25 gwei. Update your deployment script's gas price:
 
-The key functionality is:
-- Permission-based minting through the `MINTER_ROLE`
-- Default admin role is assigned to the deployer
-- Minting is restricted to addresses with the `MINTER_ROLE`
+```javascript
+const gasPrice = ethers.utils.parseUnits("25", "gwei");
+```
 
-## Security Considerations
+### Out of Gas Errors
 
-- Private keys should never be shared or committed to version control
-- Consider using a hardware wallet or secure key management system for production deployments
-- Always test thoroughly on testnets before deploying to mainnet
-- Consider getting a security audit before deploying to mainnet with real value
+If you encounter "out of gas" errors, increase the gas limit in your deployment script:
+
+```javascript
+const gasLimit = 5000000; // Increase as needed
+```
+
+### Failed Transactions
+
+If your transaction fails, check your wallet's POL balance to ensure you have enough for gas fees. The Amoy testnet can be congested, so transactions may take longer than expected.
+
+## Getting Testnet POL
+
+You can request Amoy testnet POL from the official Polygon faucet: https://amoy.polygon.technology
+
+## Contract Address and Details
+
+After successful deployment, save your contract details:
+
+- Contract Address: [Your contract address here]
+- Transaction Hash: [Your deployment transaction hash here]
+- Block Number: [Block number here]
+- Network: Polygon Amoy Testnet
+
+## Additional Resources
+
+- [Polygon Amoy Documentation](https://wiki.polygon.technology/docs/amoy/)
+- [Hardhat Documentation](https://hardhat.org/getting-started/)
+- [ThirdWeb Contracts GitHub](https://github.com/thirdweb-dev/contracts)
