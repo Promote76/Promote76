@@ -1,15 +1,18 @@
 /**
- * Pure Static HTML Server for SWF
+ * Pure HTML Server for SWF
  * 
- * This server only serves a static HTML string with zero API dependencies.
+ * This server serves a completely static HTML file with no JavaScript at all.
  */
 
 const express = require('express');
+const fs = require('fs');
+const path = require('path');
 const app = express();
 const PORT = 5000;
 
-// Define a static HTML response with all project information
-const staticHtml = `
+// Create the pure HTML file
+const htmlFilePath = path.join(__dirname, 'pure-dashboard.html');
+const htmlContent = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -147,6 +150,16 @@ const staticHtml = `
             color: #6b7280;
             word-break: break-all;
         }
+        .warning-banner {
+            background-color: #fffbeb;
+            border: 1px solid #fbbf24;
+            border-radius: 6px;
+            padding: 10px 15px;
+            margin-bottom: 20px;
+            color: #854d0e;
+            font-size: 0.9rem;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -155,6 +168,10 @@ const staticHtml = `
             <h1>Sovran Wealth Fund</h1>
             <p class="subtitle">Token Dashboard</p>
         </header>
+        
+        <div class="warning-banner">
+            This is a static HTML page with no JavaScript or API calls.
+        </div>
         
         <div class="token-info">
             <h2>SWF Token</h2>
@@ -252,16 +269,18 @@ const staticHtml = `
 </html>
 `;
 
-// Route to serve the static HTML
+// Write the HTML file to disk
+fs.writeFileSync(htmlFilePath, htmlContent);
+
+// Route to serve the static HTML file
 app.get('/', (req, res) => {
-  res.setHeader('Content-Type', 'text/html');
-  res.send(staticHtml);
+  res.sendFile(htmlFilePath);
 });
 
 // Start the server with robust error handling
 const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Pure static server running at http://0.0.0.0:${PORT}`);
-  console.log(`Serving static HTML content with no API dependencies`);
+  console.log(`Pure HTML server running at http://0.0.0.0:${PORT}`);
+  console.log(`Serving static HTML file from ${htmlFilePath}`);
 });
 
 // Keep the server alive

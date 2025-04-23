@@ -22,10 +22,6 @@ args = "Hardhat Local Node"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "SWF Database API"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
 args = "Static Dashboard"
 
 [[workflows.workflow.tasks]]
@@ -42,11 +38,15 @@ args = "Simple Static Dashboard"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Pure Static Dashboard"
+args = "Pure HTML Dashboard"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Frontend Dashboard"
+args = "SWF Database API"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "RPC Test"
 
 [[workflows.workflow]]
 name = "check_dependencies"
@@ -75,22 +75,6 @@ task = "packager.installForAll"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npx hardhat node"
-waitForPort = 8545
-
-[[workflows.workflow]]
-name = "SWF Database API"
-author = "agent"
-
-[workflows.workflow.metadata]
-agentRequireRestartOnSave = false
-
-[[workflows.workflow.tasks]]
-task = "packager.installForAll"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "node server.js"
-waitForPort = 5001
 
 [[workflows.workflow]]
 name = "Static Dashboard"
@@ -153,7 +137,7 @@ args = "node simple-static-server.js"
 waitForPort = 5000
 
 [[workflows.workflow]]
-name = "Pure Static Dashboard"
+name = "Pure HTML Dashboard"
 author = "agent"
 
 [workflows.workflow.metadata]
@@ -164,11 +148,11 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "node pure-static-server.js"
+args = "node pure-html-server.js"
 waitForPort = 5000
 
 [[workflows.workflow]]
-name = "Frontend Dashboard"
+name = "SWF Database API"
 author = "agent"
 
 [workflows.workflow.metadata]
@@ -179,7 +163,22 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "node frontend-server.js"
+args = "node server.js"
+waitForPort = 5001
+
+[[workflows.workflow]]
+name = "RPC Test"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node rpc-test.js"
 waitForPort = 5000
 
 [deployment]

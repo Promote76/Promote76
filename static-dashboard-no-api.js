@@ -1,15 +1,44 @@
 /**
- * Pure Static HTML Server for SWF
+ * Static Dashboard Server for SWF (No API Calls)
  * 
- * This server only serves a static HTML string with zero API dependencies.
+ * This server serves a dashboard with hardcoded data and no API calls.
  */
 
 const express = require('express');
 const app = express();
 const PORT = 5000;
 
-// Define a static HTML response with all project information
-const staticHtml = `
+// Static mock data instead of API calls
+const mockData = {
+  token: {
+    name: "Sovran Wealth Fund",
+    symbol: "SWF",
+    address: "0x15AD65Fb62CD9147Aa4443dA89828A693228b5F7",
+    totalSupply: "500000",
+    network: "Polygon Mainnet",
+    deploymentTx: "0x0ac75e83b1ddb5261c96d6bf73deded44fe069b96bfec13a0a34ea1c84fcbf73",
+    recipientWallet: "0xCe36333A88c2EA01f28f63131fA7dfa80AD021F6"
+  },
+  roles: [
+    { name: "Treasury", percentage: "20.00", address: "0x26a8401287ce33cc4AEb5a106cD6D282a9c2f51D" },
+    { name: "Staking", percentage: "30.00", address: "0x4B20993Bc481177ec7E8f571ceCaE8A9e22C02db" },
+    { name: "Development", percentage: "15.00", address: "0x78731D3Ca6b7E34aC0F824c42a7cC18A495cabaB" },
+    { name: "Marketing", percentage: "10.00", address: "0x617F2E2fD72FD9D5503197092aC168c91465E7f2" },
+    { name: "Community", percentage: "10.00", address: "0x17F6AD8Ef982297579C203069C1DbfFE4348c372" },
+    { name: "Team", percentage: "10.00", address: "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955" },
+    { name: "Reserve", percentage: "5.00", address: "0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f" }
+  ],
+  vault: {
+    minApr: "10.00",
+    maxApr: "30.00",
+    currentApr: "15.00",
+    totalDeposit: "0"
+  }
+};
+
+// HTML Generation function that uses the mock data instead of API calls
+function generateDashboardHtml() {
+  return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -147,20 +176,34 @@ const staticHtml = `
             color: #6b7280;
             word-break: break-all;
         }
+        .warning-banner {
+            background-color: #fffbeb;
+            border: 1px solid #fbbf24;
+            border-radius: 6px;
+            padding: 10px 15px;
+            margin-bottom: 20px;
+            color: #854d0e;
+            font-size: 0.9rem;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Sovran Wealth Fund</h1>
+            <h1>${mockData.token.name}</h1>
             <p class="subtitle">Token Dashboard</p>
         </header>
         
+        <div class="warning-banner">
+            This is a static dashboard with no API calls to avoid JSON parsing errors.
+        </div>
+        
         <div class="token-info">
             <h2>SWF Token</h2>
-            <div class="address">0x15AD65Fb62CD9147Aa4443dA89828A693228b5F7</div>
-            <div class="token-supply">500,000 SWF</div>
-            <div class="token-network">Polygon Mainnet</div>
+            <div class="address">${mockData.token.address}</div>
+            <div class="token-supply">${mockData.token.totalSupply} SWF</div>
+            <div class="token-network">${mockData.token.network}</div>
         </div>
         
         <div class="card">
@@ -178,52 +221,24 @@ const staticHtml = `
             <h2>Transaction Information</h2>
             <div class="transaction">
                 <span class="label">Deployment Transaction:</span>
-                <div class="address">0x0ac75e83b1ddb5261c96d6bf73deded44fe069b96bfec13a0a34ea1c84fcbf73</div>
+                <div class="address">${mockData.token.deploymentTx}</div>
             </div>
             <div class="transaction">
                 <span class="label">Recipient Wallet:</span>
-                <div class="address">0xCe36333A88c2EA01f28f63131fA7dfa80AD021F6</div>
+                <div class="address">${mockData.token.recipientWallet}</div>
             </div>
         </div>
         
         <div class="card">
             <h2>Role Allocations</h2>
             <div class="role-grid">
-                <div class="role-card">
-                    <div class="role-name">Treasury</div>
-                    <div class="role-percentage">20.00%</div>
-                    <div class="role-address">0x26a8401287ce33cc4AEb5a106cD6D282a9c2f51D</div>
-                </div>
-                <div class="role-card">
-                    <div class="role-name">Staking</div>
-                    <div class="role-percentage">30.00%</div>
-                    <div class="role-address">0x4B20993Bc481177ec7E8f571ceCaE8A9e22C02db</div>
-                </div>
-                <div class="role-card">
-                    <div class="role-name">Development</div>
-                    <div class="role-percentage">15.00%</div>
-                    <div class="role-address">0x78731D3Ca6b7E34aC0F824c42a7cC18A495cabaB</div>
-                </div>
-                <div class="role-card">
-                    <div class="role-name">Marketing</div>
-                    <div class="role-percentage">10.00%</div>
-                    <div class="role-address">0x617F2E2fD72FD9D5503197092aC168c91465E7f2</div>
-                </div>
-                <div class="role-card">
-                    <div class="role-name">Community</div>
-                    <div class="role-percentage">10.00%</div>
-                    <div class="role-address">0x17F6AD8Ef982297579C203069C1DbfFE4348c372</div>
-                </div>
-                <div class="role-card">
-                    <div class="role-name">Team</div>
-                    <div class="role-percentage">10.00%</div>
-                    <div class="role-address">0x14dC79964da2C08b23698B3D3cc7Ca32193d9955</div>
-                </div>
-                <div class="role-card">
-                    <div class="role-name">Reserve</div>
-                    <div class="role-percentage">5.00%</div>
-                    <div class="role-address">0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f</div>
-                </div>
+                ${mockData.roles.map(role => `
+                    <div class="role-card">
+                        <div class="role-name">${role.name}</div>
+                        <div class="role-percentage">${role.percentage}%</div>
+                        <div class="role-address">${role.address}</div>
+                    </div>
+                `).join('')}
             </div>
         </div>
         
@@ -231,15 +246,15 @@ const staticHtml = `
             <h2>Vault Information</h2>
             <div class="transaction">
                 <span class="label">APR Range:</span>
-                <div>10.00% - 30.00%</div>
+                <div>${mockData.vault.minApr}% - ${mockData.vault.maxApr}%</div>
             </div>
             <div class="transaction">
                 <span class="label">Current APR:</span>
-                <div>15.00%</div>
+                <div>${mockData.vault.currentApr}%</div>
             </div>
             <div class="transaction">
                 <span class="label">Total Deposited:</span>
-                <div>0 SWF</div>
+                <div>${mockData.vault.totalDeposit} SWF</div>
             </div>
         </div>
         
@@ -248,20 +263,25 @@ const staticHtml = `
             <p>Last updated: April 23, 2025</p>
         </footer>
     </div>
+    <script>
+        // No API calls or fetch operations
+        console.log('Dashboard loaded with static data');
+    </script>
 </body>
 </html>
-`;
+  `;
+}
 
-// Route to serve the static HTML
+// Route to serve the static dashboard
 app.get('/', (req, res) => {
   res.setHeader('Content-Type', 'text/html');
-  res.send(staticHtml);
+  res.send(generateDashboardHtml());
 });
 
 // Start the server with robust error handling
 const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Pure static server running at http://0.0.0.0:${PORT}`);
-  console.log(`Serving static HTML content with no API dependencies`);
+  console.log(`Static dashboard (no API) running at http://0.0.0.0:${PORT}`);
+  console.log(`Using hardcoded mock data instead of API calls`);
 });
 
 // Keep the server alive
