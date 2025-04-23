@@ -36,7 +36,7 @@ The `SovranWealthFund` token has the following features:
 - Minting is restricted to addresses with the MINTER_ROLE
 - Initial minters:
   - The deployer of the contract (msg.sender)
-  - The hardcoded address: `0x2A5269E92C48829fdF21D8892c23E894B11D15e3`
+  - The Treasury wallet: `0x26A8401287cE33CC4aeb5a106cd6D282a92Cf51d`
 - Pausable functionality (owner can pause all token transfers)
 - Burn functionality (any token holder can burn their own tokens)
 
