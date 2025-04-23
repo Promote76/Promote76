@@ -30,10 +30,6 @@ args = "Simple Static Dashboard"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Pure HTML Dashboard"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
 args = "SWF Database API"
 
 [[workflows.workflow.tasks]]
@@ -42,11 +38,7 @@ args = "Minimal Dashboard"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Ultra Minimal Dashboard"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "SWF Dashboard"
+args = "Deployment Server"
 
 [[workflows.workflow]]
 name = "check_dependencies"
@@ -108,21 +100,6 @@ args = "node simple-static-server.js"
 waitForPort = 5000
 
 [[workflows.workflow]]
-name = "Pure HTML Dashboard"
-author = "agent"
-
-[workflows.workflow.metadata]
-agentRequireRestartOnSave = false
-
-[[workflows.workflow.tasks]]
-task = "packager.installForAll"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "node pure-html-server.js"
-waitForPort = 5000
-
-[[workflows.workflow]]
 name = "SWF Database API"
 author = "agent"
 
@@ -153,7 +130,7 @@ args = "node minimal-dashboard.js"
 waitForPort = 5000
 
 [[workflows.workflow]]
-name = "Ultra Minimal Dashboard"
+name = "Deployment Server"
 author = "agent"
 
 [workflows.workflow.metadata]
@@ -164,22 +141,7 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "node ultra-minimal.js"
-waitForPort = 5000
-
-[[workflows.workflow]]
-name = "SWF Dashboard"
-author = "agent"
-
-[workflows.workflow.metadata]
-agentRequireRestartOnSave = false
-
-[[workflows.workflow.tasks]]
-task = "packager.installForAll"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "node server.js"
+args = "node simple-deployment-server.js"
 waitForPort = 5000
 
 [deployment]

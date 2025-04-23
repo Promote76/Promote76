@@ -1,15 +1,15 @@
 /**
- * SWF Deployment Server
+ * Simple Deployment Server for SWF
  * 
- * A dedicated server file for Replit deployment with no dependencies on other services.
- * This server directly serves the dashboard HTML.
+ * This server uses Node.js's built-in http module with no dependencies.
  */
 
-const express = require('express');
-const app = express();
+const http = require('http');
+
+// Port to listen on
 const PORT = process.env.PORT || 5000;
 
-// Simple deployable static dashboard
+// The HTML content of our dashboard
 const dashboardHTML = `
 <!DOCTYPE html>
 <html>
@@ -31,7 +31,8 @@ const dashboardHTML = `
       text-align: center;
       border-bottom: 2px solid #3498db;
       padding-bottom: 10px;
-      margin-bottom: 30px;
+      margin-bottom:
+      30px;
     }
     .card {
       background: white;
@@ -166,19 +167,19 @@ const dashboardHTML = `
 </html>
 `;
 
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.set('Content-Type', 'text/plain');
-  res.send('OK');
-});
-
-// Serve the dashboard for all routes
-app.get('*', (req, res) => {
-  res.set('Content-Type', 'text/html');
-  res.send(dashboardHTML);
+// Create a simple HTTP server
+const server = http.createServer((req, res) => {
+  // Set response headers
+  res.writeHead(200, {
+    'Content-Type': 'text/html',
+    'Content-Length': Buffer.byteLength(dashboardHTML)
+  });
+  
+  // Send the response
+  res.end(dashboardHTML);
 });
 
 // Start the server
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`SWF Deployment Server running on http://0.0.0.0:${PORT}`);
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`Simple Deployment Server running on http://0.0.0.0:${PORT}`);
 });

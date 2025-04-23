@@ -1,0 +1,138 @@
+
+---
+
+🛠️ Project Structure
+
+/replit-proxy-dashboard
+├── server.js
+├── package.json
+└── public/
+    └── index.html
+
+
+---
+
+📄 server.js — Express Proxy Server
+
+const express = require("express");
+const fetch = require("node-fetch");
+const path = require("path");
+
+const app = express();
+app.use(express.json());
+app.use(express.static("public")); // Serve static files from 'public' directory
+
+const HARDHAT_RPC_URL = "http://localhost:8545"; // Local Hardhat node
+
+// Proxy endpoint for JSON-RPC requests
+app.post("/rpc", async (req, res) => {
+  try {
+    const response = await fetch(HARDHAT_RPC_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(req.body),
+    });
+
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error("Proxy error:", error.message);
+    res.status(500).json({ error: "Proxy failed", details: error.message });
+  }
+});
+
+// Health check endpoint
+app.get("/health", (req, res) => res.send("OK"));
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
+});
+
+
+---
+
+📄 public/index.html — Frontend Dashboard
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SWF Dashboard</title>
+</head>
+<body>
+  <h1>SWF Dashboard</h1>
+  <p id="output">Loading latest block number...</p>
+
+  <script>
+    fetch("/rpc", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        method: "eth_blockNumber",
+        params: [],
+        id: 1
+      })
+    })
+      .then(res => res.text())
+      .then(text => {
+        try {
+          const data = JSON.parse(text);
+          const blockNumber = parseInt(data.result, 16);
+          document.getElementById("output").innerText = "Latest Block: " + blockNumber;
+        } catch (err) {
+          document.getElementById("output").innerText = "Error parsing JSON: " + err.message;
+        }
+      })
+      .catch(err => {
+        document.getElementById("output").innerText = "Fetch error: " + err.message;
+      });
+  </script>
+</body>
+</html>
+
+
+---
+
+📦 package.json — Dependencies
+
+{
+  "name": "replit-proxy-dashboard",
+  "version": "1.0.0",
+  "description": "Replit project with Express proxy and frontend dashboard",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "node-fetch": "^2.6.7"
+  }
+}
+
+
+---
+
+🚀 Deployment Instructions
+
+1. Create a new Node.js Replit project.
+
+
+2. Add the above files (server.js, package.json, and public/index.html) to your project.
+
+
+3. Install dependencies by running:
+
+npm install
+
+
+4. Start your Hardhat node in a separate Replit tab or terminal:
+
+npx hardhat node
+
+
+5. Run the server:
+
+node server.js
+

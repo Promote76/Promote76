@@ -87,23 +87,14 @@
       font-size: 0.9em;
       color: #6b7280;
     }
-    .accounts-list {
-      list-style: none;
-      padding: 0;
-    }
-    .accounts-list li {
-      margin-bottom: 8px;
+    #blockchain-data {
       font-family: monospace;
       background: #f1f5f9;
-      padding: 8px;
+      padding: 10px;
       border-radius: 4px;
+      font-size: 0.9em;
       overflow-wrap: break-word;
       word-break: break-all;
-    }
-    #loading {
-      text-align: center;
-      padding: 20px;
-      color: #6b7280;
     }
   </style>
 </head>
@@ -115,25 +106,9 @@
     
     <h1>Sovran Wealth Fund</h1>
     
-    <div id="connection-status" class="success">
-      Connecting to Blockchain...
-    </div>
-    
-    <div id="loading">Loading blockchain data...</div>
-    
-    <div id="blockchain-data" style="display: none;">
-      <div class="card">
-        <h2>Blockchain Data</h2>
-        <p><strong>Current Block:</strong> <span id="block-number">Loading...</span></p>
-        <p><strong>Chain ID:</strong> <span id="chain-id">Loading...</span></p>
-      </div>
-      
-      <div class="card">
-        <h2>Available Accounts</h2>
-        <ul id="accounts-list" class="accounts-list">
-          <li>Loading accounts...</li>
-        </ul>
-      </div>
+    <div class="card">
+      <h2>Blockchain Data</h2>
+      <p id="blockchain-data">Loading latest block number...</p>
     </div>
     
     <div class="card">
@@ -144,6 +119,14 @@
       <p><strong>Network:</strong> Polygon Mainnet</p>
       <p><strong>Contract Address:</strong></p>
       <div class="address">0x15AD65Fb62CD9147Aa4443dA89828A693228b5F7</div>
+    </div>
+    
+    <div class="card">
+      <h2>Transaction Details</h2>
+      <p><strong>Deployment Transaction:</strong></p>
+      <div class="address">0x0ac75e83b1ddb5261c96d6bf73deded44fe069b96bfec13a0a34ea1c84fcbf73</div>
+      <p><strong>Recipient Wallet:</strong></p>
+      <div class="address">0xCe36333A88c2EA01f28f63131fA7dfa80AD021F6</div>
     </div>
     
     <div class="card">
@@ -161,91 +144,45 @@
   </div>
 
   <script>
-    // Helper function to make RPC calls
-    async function makeRpcCall(method, params = []) {
+    // Make a simple RPC call with proper error handling
+    fetch('/rpc', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        method: 'eth_blockNumber',
+        params: [],
+        id: 1
+      })
+    })
+    .then(res => res.text())
+    .then(text => {
       try {
-        const response = await fetch('/rpc', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            jsonrpc: '2.0',
-            method: method,
-            params: params,
-            id: Date.now()
-          })
-        });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
+        const data = JSON.parse(text);
         if (data.error) {
-          throw new Error(`RPC error: ${data.error.message || JSON.stringify(data.error)}`);
+          throw new Error(`RPC Error: ${data.error.message || JSON.stringify(data.error)}`);
         }
         
-        return data.result;
-      } catch (error) {
-        console.error(`Error calling ${method}:`, error.message);
-        throw error;
+        if (data.result) {
+          const blockNumber = parseInt(data.result, 16);
+          document.getElementById('blockchain-data').innerHTML = 
+            `<div class="success">Connected to Blockchain ✓</div>
+             <p><strong>Latest Block:</strong> ${blockNumber}</p>`;
+        } else {
+          throw new Error('No result in response');
+        }
+      } catch (err) {
+        console.error('Error parsing JSON:', err.message);
+        document.getElementById('blockchain-data').innerHTML = 
+          `<div class="error">Error: ${err.message}</div>
+           <p>Raw response: ${text.substring(0, 100)}${text.length > 100 ? '...' : ''}</p>`;
       }
-    }
-
-    // Main function to load blockchain data
-    async function loadBlockchainData() {
-      try {
-        // Fetch multiple blockchain values in parallel
-        const [blockNumberHex, accounts, chainIdHex] = await Promise.all([
-          makeRpcCall('eth_blockNumber'),
-          makeRpcCall('eth_accounts'),
-          makeRpcCall('eth_chainId')
-        ]);
-        
-        // Update connection status
-        document.getElementById('connection-status').className = 'success';
-        document.getElementById('connection-status').textContent = 'Connected to Blockchain ✓';
-        
-        // Convert hex values to decimal
-        const blockNumber = parseInt(blockNumberHex, 16);
-        const chainId = parseInt(chainIdHex, 16);
-        
-        // Update UI with blockchain data
-        document.getElementById('block-number').textContent = blockNumber;
-        document.getElementById('chain-id').textContent = chainId;
-        
-        // Generate accounts list
-        const accountsList = document.getElementById('accounts-list');
-        accountsList.innerHTML = '';
-        
-        accounts.forEach((account, index) => {
-          const li = document.createElement('li');
-          li.textContent = `${index + 1}. ${account}`;
-          accountsList.appendChild(li);
-        });
-        
-        // Hide loading indicator and show blockchain data
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('blockchain-data').style.display = 'block';
-      } catch (error) {
-        // Update UI to show error
-        document.getElementById('connection-status').className = 'error';
-        document.getElementById('connection-status').textContent = 'Blockchain Connection Error';
-        
-        // Show error details in loading area
-        document.getElementById('loading').innerHTML = `
-          <p>Failed to connect to blockchain: ${error.message}</p>
-          <p>The static dashboard information is still available below.</p>
-        `;
-        
-        console.error('Failed to load blockchain data:', error);
-      }
-    }
-
-    // Load data when page is loaded
-    window.addEventListener('DOMContentLoaded', loadBlockchainData);
+    })
+    .catch(err => {
+      console.error('Fetch error:', err.message);
+      document.getElementById('blockchain-data').innerText = 
+        `Error connecting to blockchain: ${err.message}`;
+    });
   </script>
 </body>
 </html>

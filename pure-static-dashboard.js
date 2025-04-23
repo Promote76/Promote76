@@ -1,3 +1,16 @@
+/**
+ * Pure Static Dashboard for SWF
+ * 
+ * This script implements an absolutely minimal static dashboard with no
+ * blockchain interaction at all to avoid any parsing or communication issues.
+ */
+
+const express = require('express');
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+// Static HTML content with hardcoded values
+const htmlContent = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -154,3 +167,19 @@
   </div>
 </body>
 </html>
+`;
+
+// Serve the static HTML content
+app.get('/', (req, res) => {
+  res.send(htmlContent);
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.send('OK');
+});
+
+// Start the server
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Pure Static Dashboard running on http://0.0.0.0:${PORT}`);
+});
