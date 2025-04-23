@@ -1,495 +1,376 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sovran Wealth Fund</title>
-    <style>
-        /* Base styles */
-        :root {
-            --primary: #3b82f6;
-            --primary-dark: #2563eb;
-            --secondary: #14b8a6;
-            --background: #f9fafb;
-            --surface: #ffffff;
-            --error: #ef4444;
-            --success: #10b981;
-            --text-primary: #111827;
-            --text-secondary: #4b5563;
-        }
-        
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            background-color: var(--background);
-            color: var(--text-primary);
-        }
-
-        /* Layout */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        header {
-            background-color: #1e3a8a;
-            color: white;
-            padding: 1.5rem;
-            border-radius: 10px;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        header h1 {
-            margin: 0 0 0.5rem 0;
-            font-size: 2.5rem;
-        }
-
-        header p {
-            margin: 0 0 1rem 0;
-            opacity: 0.9;
-        }
-
-        .network-status {
-            display: inline-block;
-            background-color: #166534;
-            color: white;
-            border-radius: 20px;
-            padding: 0.3rem 1rem;
-            font-size: 0.85rem;
-            margin-bottom: 1rem;
-        }
-
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
-        }
-
-        @media (min-width: 768px) {
-            .main-content {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        /* Cards */
-        .card {
-            background-color: var(--surface);
-            border-radius: 10px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-
-        .card h2 {
-            color: var(--primary-dark);
-            margin-top: 0;
-            margin-bottom: 1rem;
-            border-bottom: 1px solid #e5e7eb;
-            padding-bottom: 0.5rem;
-        }
-
-        .card-content {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .stat-group {
-            margin-bottom: 1rem;
-        }
-
-        .stat-group .stat {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.3rem 0;
-        }
-
-        .stat-group .stat:not(:last-child) {
-            border-bottom: 1px solid #f3f4f6;
-        }
-
-        .stat-value {
-            font-weight: bold;
-            color: var(--primary-dark);
-        }
-
-        /* Form elements */
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: bold;
-            color: var(--text-secondary);
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.375rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .btn {
-            padding: 0.75rem 1.5rem;
-            font-weight: bold;
-            border: none;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--primary-dark);
-        }
-
-        .btn-secondary {
-            background-color: #d1d5db;
-            color: var(--text-primary);
-        }
-
-        .btn-secondary:hover {
-            background-color: #9ca3af;
-        }
-
-        .btn-block {
-            width: 100%;
-        }
-
-        .btn-sm {
-            padding: 0.5rem 1rem;
-            font-size: 0.875rem;
-        }
-
-        /* Token metrics section */
-        .token-metrics {
-            margin-top: 2rem;
-            background-color: var(--surface);
-            border-radius: 10px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .token-metrics h2 {
-            color: var(--primary-dark);
-            margin-top: 0;
-            margin-bottom: 1rem;
-            border-bottom: 1px solid #e5e7eb;
-            padding-bottom: 0.5rem;
-        }
-
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-        }
-
-        .metric-box {
-            background-color: #f3f4f6;
-            border-radius: 8px;
-            padding: 1rem;
-            text-align: center;
-        }
-
-        .metric-title {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.5rem;
-        }
-
-        .metric-value {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--primary-dark);
-        }
-
-        /* Footer */
-        footer {
-            margin-top: 2rem;
-            text-align: center;
-            padding: 1.5rem;
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-        }
-
-        /* Connect wallet button */
-        .connect-btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 0.375rem;
-            padding: 0.75rem 1.5rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            margin-top: 1rem;
-        }
-
-        .connect-btn:hover {
-            background-color: var(--primary-dark);
-        }
-
-        .wallet-info {
-            background-color: #f3f4f6;
-            border-radius: 8px;
-            padding: 1rem;
-            margin-top: 1rem;
-            text-align: center;
-            display: none;
-        }
-
-        .connected-badge {
-            display: inline-block;
-            background-color: var(--success);
-            color: white;
-            border-radius: 20px;
-            padding: 0.3rem 1rem;
-            font-size: 0.85rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .account-info {
-            font-family: monospace;
-            background-color: #e5e7eb;
-            padding: 0.5rem;
-            border-radius: 4px;
-            margin-top: 0.5rem;
-        }
-
-        /* Connect wallet prompt */
-        .connect-prompt {
-            text-align: center;
-            padding: 3rem 1rem;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin: 2rem 0;
-        }
-
-        .connect-prompt h2 {
-            color: var(--primary-dark);
-            margin-top: 0;
-        }
-
-        .dashboard {
-            display: none;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sovran Wealth Fund (SWF) - Token Dashboard</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Ethers.js -->
+  <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+  
+  <!-- Token Info JS -->
+  <script src="token-info.js"></script>
+  <script src="swf-token-tracker.js"></script>
+  
+  <style>
+    .gradient-bg {
+      background: linear-gradient(135deg, #2a0845 0%, #6441a5 100%);
+    }
+    .card {
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .network-status {
+      background-color: #8247e5;
+      color: white;
+      font-size: 0.8rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 1rem;
+    }
+    .connect-btn {
+      background: linear-gradient(90deg, #00d2ff 0%, #3a7bd5 100%);
+      transition: all 0.3s ease;
+    }
+    .connect-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+    .metric-box {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-radius: 0.5rem;
+      padding: 1rem;
+      transition: all 0.3s ease;
+    }
+    .metric-box:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      transform: translateY(-2px);
+    }
+    .pulse-ring {
+      animation: pulse 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+    }
+    .notification {
+      position: relative;
+      padding: 1rem;
+      margin-bottom: 0.5rem;
+      border-radius: 0.5rem;
+      animation: slideIn 0.3s ease;
+      color: white;
+    }
+    .notification.success {
+      background-color: rgba(16, 185, 129, 0.9);
+    }
+    .notification.info {
+      background-color: rgba(59, 130, 246, 0.9);
+    }
+    .notification.error {
+      background-color: rgba(239, 68, 68, 0.9);
+    }
+    .notification.fade-out {
+      animation: fadeOut 0.5s ease forwards;
+    }
+    #notificationsContainer {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      width: 300px;
+      z-index: 50;
+    }
+    .token-tracker {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      width: 300px;
+      z-index: 40;
+      backdrop-filter: blur(16px) saturate(180%);
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 0.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 1rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    @keyframes pulse {
+      0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(130, 71, 229, 0.7);
+      }
+      70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 10px rgba(130, 71, 229, 0);
+      }
+      100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(130, 71, 229, 0);
+      }
+    }
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    @keyframes fadeOut {
+      from {
+        opacity: 1;
+      }
+      to {
+        opacity: 0;
+      }
+    }
+    .spinner {
+      width: 1rem;
+      height: 1rem;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+      display: inline-block;
+      margin-right: 0.5rem;
+    }
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
 </head>
-<body>
-    <div class="container">
-        <header>
-            <h1>Sovran Wealth Fund</h1>
-            <p>Advanced Token Staking & Dynamic APR Distribution System</p>
-            <div class="network-status">Polygon Mainnet</div>
-            <button id="connectWalletBtn" class="connect-btn">Connect Wallet</button>
-            
-            <div id="walletInfo" class="wallet-info">
-                <div class="connected-badge">Connected</div>
-                <p>Account: <span id="accountDisplay">0x0000...0000</span></p>
-                <div class="account-info" id="fullAccountDisplay">Not connected</div>
-            </div>
-        </header>
-
-        <div id="connectPrompt" class="connect-prompt">
-            <h2>Welcome to Sovran Wealth Fund</h2>
-            <p>Connect your wallet to interact with the SWF ecosystem</p>
-            <p>From here, you'll be able to:</p>
-            <ul style="text-align: left; display: inline-block;">
-                <li>Stake your SWF tokens to earn rewards with dynamic APR</li>
-                <li>Deposit into the Basket Vault to influence APR rates</li>
-                <li>View token metrics and distribution statistics</li>
-                <li>Track your transactions and rewards history</li>
-            </ul>
-            <button id="promptConnectBtn" class="connect-btn">Connect Wallet</button>
-        </div>
-
-        <div id="dashboard" class="dashboard">
-            <div class="main-content">
-                <div class="card">
-                    <h2>SWF Staking</h2>
-                    <div class="card-content">
-                        <div class="stat-group">
-                            <div class="stat">
-                                <span>Current APR:</span>
-                                <span class="stat-value">20%</span>
-                            </div>
-                            <div class="stat">
-                                <span>Total Staked:</span>
-                                <span class="stat-value">1,250,000 SWF</span>
-                            </div>
-                            <div class="stat">
-                                <span>Your Staked Balance:</span>
-                                <span class="stat-value">0 SWF</span>
-                            </div>
-                            <div class="stat">
-                                <span>Pending Rewards:</span>
-                                <span class="stat-value">0 SWF</span>
-                            </div>
-                            <div class="stat">
-                                <span>Est. Daily Rewards:</span>
-                                <span class="stat-value">0 SWF</span>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="stakeAmount">Stake Amount:</label>
-                            <input type="number" id="stakeAmount" class="form-control" placeholder="Amount to stake" min="0" step="0.01">
-                            <button class="btn btn-secondary btn-sm" style="margin-bottom: 0.5rem;">Max</button>
-                            <button class="btn btn-primary btn-block">Stake SWF Tokens</button>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="unstakeAmount">Unstake Amount:</label>
-                            <input type="number" id="unstakeAmount" class="form-control" placeholder="Amount to unstake" min="0" step="0.01">
-                            <button class="btn btn-secondary btn-sm" style="margin-bottom: 0.5rem;">Max</button>
-                            <button class="btn btn-primary btn-block">Unstake SWF Tokens</button>
-                        </div>
-
-                        <button class="btn btn-primary btn-block">Claim Rewards</button>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h2>SWF Basket Vault</h2>
-                    <div class="card-content">
-                        <div class="stat-group">
-                            <div class="stat">
-                                <span>Total Deposited:</span>
-                                <span class="stat-value">500,000 SWF</span>
-                            </div>
-                            <div class="stat">
-                                <span>Your Deposit:</span>
-                                <span class="stat-value">0 SWF</span>
-                            </div>
-                            <div class="stat">
-                                <span>Available Balance:</span>
-                                <span class="stat-value">0 SWF</span>
-                            </div>
-                            <div class="stat">
-                                <span>Basket Tokens:</span>
-                                <span class="stat-value">0 SWF-BASKET</span>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="depositAmount">Deposit Amount:</label>
-                            <input type="number" id="depositAmount" class="form-control" placeholder="Amount to deposit" min="0" step="0.01">
-                            <button class="btn btn-secondary btn-sm" style="margin-bottom: 0.5rem;">Max</button>
-                            <button class="btn btn-primary btn-block">Deposit to Vault</button>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="withdrawAmount">Withdraw Amount:</label>
-                            <input type="number" id="withdrawAmount" class="form-control" placeholder="Amount to withdraw" min="0" step="0.01">
-                            <button class="btn btn-secondary btn-sm" style="margin-bottom: 0.5rem;">Max</button>
-                            <button class="btn btn-primary btn-block">Withdraw from Vault</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="token-metrics">
-                <h2>SWF Token Metrics</h2>
-                <div class="metrics-grid">
-                    <div class="metric-box">
-                        <div class="metric-title">Total Supply</div>
-                        <div class="metric-value">100,000,000</div>
-                    </div>
-                    <div class="metric-box">
-                        <div class="metric-title">Circulating Supply</div>
-                        <div class="metric-value">25,000,000</div>
-                    </div>
-                    <div class="metric-box">
-                        <div class="metric-title">Treasury Balance</div>
-                        <div class="metric-value">35,000,000</div>
-                    </div>
-                    <div class="metric-box">
-                        <div class="metric-title">Distribution Rate</div>
-                        <div class="metric-value">2% Weekly</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <footer>
-            <p>&copy; 2025 Sovran Wealth Fund. All rights reserved.</p>
-            <p>Smart Contracts deployed on Polygon Mainnet</p>
-        </footer>
+<body class="gradient-bg min-h-screen text-white">
+  <header class="p-4 flex justify-between items-center">
+    <div class="flex items-center">
+      <div class="h-10 w-10 rounded-full bg-white mr-3 flex items-center justify-center">
+        <span class="font-bold text-purple-900">SWF</span>
+      </div>
+      <h1 class="text-2xl font-bold">Sovran Wealth Fund</h1>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const connectWalletBtn = document.getElementById('connectWalletBtn');
-            const promptConnectBtn = document.getElementById('promptConnectBtn');
-            const walletInfo = document.getElementById('walletInfo');
-            const accountDisplay = document.getElementById('accountDisplay');
-            const fullAccountDisplay = document.getElementById('fullAccountDisplay');
-            const connectPrompt = document.getElementById('connectPrompt');
-            const dashboard = document.getElementById('dashboard');
-
-            // Function to handle wallet connection
-            async function connectWallet() {
-                if (window.ethereum) {
-                    try {
-                        // Request account access
-                        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                        const account = accounts[0];
-                        
-                        // Display account info
-                        accountDisplay.textContent = `${account.substring(0, 6)}...${account.substring(account.length - 4)}`;
-                        fullAccountDisplay.textContent = account;
-                        
-                        // Update UI
-                        walletInfo.style.display = 'block';
-                        connectWalletBtn.style.display = 'none';
-                        connectPrompt.style.display = 'none';
-                        dashboard.style.display = 'block';
-                        
-                        // Check network
-                        const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-                        console.log(`Connected to chain: ${chainId}`);
-                        
-                        // Here you would normally initialize contract connections
-                        
-                    } catch (error) {
-                        console.error('Error connecting wallet:', error);
-                        alert('Failed to connect wallet. Please try again.');
-                    }
-                } else {
-                    alert('MetaMask or compatible Ethereum wallet not detected. Please install MetaMask or another Web3 provider to use this application.');
-                }
-            }
-
-            // Add click handlers
-            connectWalletBtn.addEventListener('click', connectWallet);
-            promptConnectBtn.addEventListener('click', connectWallet);
+    
+    <div class="flex items-center">
+      <span class="network-status mr-4">Connecting...</span>
+      <div id="walletInfo" class="hidden">
+        <div class="flex items-center">
+          <div class="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center mr-2 pulse-ring">
+            <span class="text-xs">🔒</span>
+          </div>
+          <div>
+            <span id="accountDisplay" class="font-mono text-sm">0x0000...0000</span>
+            <span class="hidden" id="fullAccountDisplay"></span>
+          </div>
+        </div>
+      </div>
+      <button class="connect-btn ml-4 py-2 px-6 rounded-full font-bold shadow-lg">Connect Wallet</button>
+    </div>
+  </header>
+  
+  <main class="container mx-auto p-4">
+    <!-- Welcome Message / Connection Prompt -->
+    <div id="connectPrompt" class="text-center py-16">
+      <h2 class="text-4xl font-bold mb-4">Welcome to Sovran Wealth Fund</h2>
+      <p class="text-xl mb-8 max-w-2xl mx-auto opacity-80">Connect your wallet to view your token balance, stake your tokens, and view your rewards.</p>
+      <button class="connect-btn py-3 px-8 rounded-full font-bold text-lg shadow-lg">Connect Wallet</button>
+    </div>
+    
+    <!-- Dashboard (Hidden until connected) -->
+    <div id="dashboard" class="hidden">
+      <!-- Token Metrics -->
+      <div class="mb-8">
+        <h2 class="text-2xl font-bold mb-4">Token Metrics</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="metric-box">
+            <h3 class="text-lg font-semibold mb-2">Total Supply</h3>
+            <p class="metric-value text-3xl font-bold">--</p>
+            <p class="text-sm opacity-70">SWF</p>
+          </div>
+          <div class="metric-box">
+            <h3 class="text-lg font-semibold mb-2">Current APR</h3>
+            <p class="metric-value text-3xl font-bold">15%</p>
+            <p class="text-sm opacity-70">Annual Percentage Rate</p>
+          </div>
+          <div class="metric-box">
+            <h3 class="text-lg font-semibold mb-2">Staked Total</h3>
+            <p class="metric-value text-3xl font-bold">--</p>
+            <p class="text-sm opacity-70">SWF</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Staking Section -->
+      <div class="mb-8">
+        <h2 class="text-2xl font-bold mb-4">Staking Dashboard</h2>
+        <div class="card p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Staking Info -->
+            <div>
+              <h3 class="text-xl font-bold mb-4">Your Staking Stats</h3>
+              <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="stat">
+                  <p class="text-sm opacity-70">Your Staked Balance</p>
+                  <p class="stat-value text-xl font-bold">-- SWF</p>
+                </div>
+                <div class="stat">
+                  <p class="text-sm opacity-70">Reward Rate</p>
+                  <p class="stat-value text-xl font-bold">15% APR</p>
+                </div>
+                <div class="stat">
+                  <p class="text-sm opacity-70">Rewards Earned</p>
+                  <p class="stat-value text-xl font-bold">-- SWF</p>
+                </div>
+                <div class="stat">
+                  <p class="text-sm opacity-70">Time Staked</p>
+                  <p class="stat-value text-xl font-bold">-- days</p>
+                </div>
+              </div>
+              <div class="flex gap-3">
+                <button class="bg-indigo-600 hover:bg-indigo-700 py-2 px-4 rounded-lg font-bold transition">
+                  Claim Rewards
+                </button>
+                <button class="bg-pink-600 hover:bg-pink-700 py-2 px-4 rounded-lg font-bold transition">
+                  Unstake Tokens
+                </button>
+              </div>
+            </div>
             
-            // Check if already connected
-            if (window.ethereum && window.ethereum.selectedAddress) {
-                console.log('Wallet already connected');
-                // Just trigger the connect function again to update UI
-                connectWallet();
-            }
-        });
-    </script>
+            <!-- Staking Form -->
+            <div>
+              <h3 class="text-xl font-bold mb-4">Stake Your Tokens</h3>
+              <div class="bg-white/5 p-4 rounded-lg mb-4">
+                <div class="flex justify-between mb-2">
+                  <span>Amount to Stake</span>
+                  <span>Balance: -- SWF</span>
+                </div>
+                <div class="flex gap-2">
+                  <input type="number" placeholder="Enter amount" class="w-full bg-white/10 p-3 rounded-lg text-white" />
+                  <button class="bg-white/10 py-2 px-3 rounded-lg">MAX</button>
+                </div>
+              </div>
+              <div class="flex gap-3">
+                <button class="bg-gradient-to-r from-green-500 to-emerald-600 w-full py-3 rounded-lg font-bold transition hover:opacity-90">
+                  Stake Tokens
+                </button>
+              </div>
+              <p class="text-sm opacity-70 mt-3">
+                * Staking requires approval of the SWF token contract. Minimum stake is 50 SWF.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Basket Vault Section -->
+      <div>
+        <h2 class="text-2xl font-bold mb-4">Basket Vault</h2>
+        <div class="card p-6">
+          <div class="mb-6">
+            <p class="mb-4">
+              The SWF Basket Vault stores underlying assets that back the SWF token. Deposit into the vault to increase APR stability.
+            </p>
+            <div class="bg-white/5 p-4 rounded-lg">
+              <h4 class="font-bold mb-2">Current Vault Metrics</h4>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                  <p class="text-sm opacity-70">Total Value Locked</p>
+                  <p class="text-xl font-bold">$--</p>
+                </div>
+                <div>
+                  <p class="text-sm opacity-70">Asset Count</p>
+                  <p class="text-xl font-bold">--</p>
+                </div>
+                <div>
+                  <p class="text-sm opacity-70">Staking Impact</p>
+                  <p class="text-xl font-bold">+3.2%</p>
+                </div>
+                <div>
+                  <p class="text-sm opacity-70">Reserve Ratio</p>
+                  <p class="text-xl font-bold">--</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h4 class="font-bold mb-3">Deposit to Vault</h4>
+              <div class="bg-white/5 p-4 rounded-lg mb-4">
+                <div class="flex justify-between mb-2">
+                  <span>Asset</span>
+                  <span>Balance: --</span>
+                </div>
+                <select class="w-full bg-white/10 p-3 rounded-lg text-white mb-4">
+                  <option>USDC</option>
+                  <option>USDT</option>
+                  <option>DAI</option>
+                  <option>WETH</option>
+                  <option>WBTC</option>
+                </select>
+                <div class="flex justify-between mb-2">
+                  <span>Amount</span>
+                </div>
+                <div class="flex gap-2">
+                  <input type="number" placeholder="Enter amount" class="w-full bg-white/10 p-3 rounded-lg text-white" />
+                  <button class="bg-white/10 py-2 px-3 rounded-lg">MAX</button>
+                </div>
+              </div>
+              <button class="bg-gradient-to-r from-blue-500 to-indigo-600 w-full py-3 rounded-lg font-bold transition hover:opacity-90">
+                Deposit to Vault
+              </button>
+            </div>
+            <div>
+              <h4 class="font-bold mb-3">Vault Asset Allocation</h4>
+              <div class="bg-white/5 p-4 rounded-lg h-64 flex items-center justify-center">
+                <p class="opacity-70">Connect your wallet to view vault assets</p>
+                <!-- Chart will go here -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <footer class="container mx-auto p-4 mt-10 opacity-60 text-sm">
+    <div class="flex flex-col md:flex-row justify-between items-center">
+      <p>© 2025 Sovran Wealth Fund. All rights reserved.</p>
+      <div class="flex gap-4 mt-4 md:mt-0">
+        <a href="#" class="hover:text-blue-400">Documentation</a>
+        <a href="#" class="hover:text-blue-400">GitHub</a>
+        <a href="#" class="hover:text-blue-400">Smart Contract</a>
+      </div>
+    </div>
+  </footer>
+  
+  <!-- Notifications Container -->
+  <div id="notificationsContainer"></div>
+  
+  <!-- Token Tracker Widget -->
+  <div class="token-tracker">
+    <h3 class="text-lg font-bold mb-2">SWF Token Tracker</h3>
+    <div id="transactionStatus" class="bg-white/5 p-3 rounded-lg mb-3">
+      <p class="text-sm mb-2">Tracking transaction status for the token mint (500,000 SWF to your wallet):</p>
+      <div class="flex items-center text-xs">
+        <span class="spinner"></span>
+        <span>Transaction pending...</span>
+      </div>
+      <p class="text-xs mt-2 opacity-70">Transaction Hash: 0xba8907244039a417232ef0da7f5de49d3b7623948aa8b23c0cf36ecdd76f8778</p>
+    </div>
+    <div class="bg-white/5 p-3 rounded-lg mb-3">
+      <div class="flex justify-between items-center mb-1">
+        <span class="font-semibold">Your Token Balance:</span>
+        <span id="tokenBalance" class="font-mono">-- SWF</span>
+      </div>
+      <div class="flex justify-between items-center text-xs opacity-70">
+        <span>Status:</span>
+        <span id="trackerStatus">Not started</span>
+      </div>
+    </div>
+    <button id="startTracker" class="bg-gradient-to-r from-purple-500 to-indigo-600 w-full py-2 rounded-lg font-bold text-sm transition hover:opacity-90">
+      Start Token Tracker
+    </button>
+  </div>
 </body>
 </html>

@@ -16,7 +16,8 @@ async function main() {
   
   try {
     // Connect to the network
-    const provider = new ethers.providers.JsonRpcProvider(process.env.POLYGON_RPC_URL || "https://polygon-rpc.com");
+    const alchemyUrl = `https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`;
+    const provider = new ethers.providers.JsonRpcProvider(alchemyUrl);
     
     // Get the ABI for the SWF token contract
     // We'll use a minimal ABI for an ERC20 token since we only need to check balances

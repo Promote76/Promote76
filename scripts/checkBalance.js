@@ -1,43 +1,57 @@
-// Simple script to check balance and nonce
-require("dotenv").config();
 const { ethers } = require("hardhat");
+require('dotenv').config();
 
 async function main() {
+  // The wallet address to check
+  const walletAddressToCheck = "0xCe36333A88c2EA01f28f63131fA7dfa80AD021F6";
+  
+  // SWF Token contract address
+  const swfTokenAddress = "0x15AD65Fb62CD9147Aa4443dA89828A693228b5F7";
+  
   try {
-    const TREASURY_ADDRESS = "0x26A8401287cE33CC4aeb5a106cd6D282a92Cf51d";
+    // Connect to the network
+    const alchemyUrl = `https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`;
+    const provider = new ethers.providers.JsonRpcProvider(alchemyUrl);
     
-    console.log("Checking Treasury wallet status...");
-    console.log("Address:", TREASURY_ADDRESS);
+    // Minimal ABI for ERC20 token
+    const erc20Abi = [
+      "function name() view returns (string)",
+      "function symbol() view returns (string)",
+      "function decimals() view returns (uint8)",
+      "function totalSupply() view returns (uint256)",
+      "function balanceOf(address) view returns (uint256)"
+    ];
     
-    // Get the provider
-    const provider = ethers.provider;
+    // Create contract instance
+    const tokenContract = new ethers.Contract(swfTokenAddress, erc20Abi, provider);
     
-    // Get balance
-    const balance = await provider.getBalance(TREASURY_ADDRESS);
-    console.log("Balance:", ethers.utils.formatEther(balance), "POL");
+    // Get token information
+    const [name, symbol, decimals, totalSupply, balance] = await Promise.all([
+      tokenContract.name(),
+      tokenContract.symbol(),
+      tokenContract.decimals(),
+      tokenContract.totalSupply(),
+      tokenContract.balanceOf(walletAddressToCheck)
+    ]);
     
-    // Get nonce
-    const nonce = await provider.getTransactionCount(TREASURY_ADDRESS);
-    console.log("Current nonce:", nonce);
-    
-    // Check network status
-    const network = await provider.getNetwork();
-    console.log("Connected to network:", network.name);
-    console.log("Chain ID:", network.chainId);
-    
-    // Get latest block
-    const latestBlock = await provider.getBlock("latest");
-    console.log("Latest block number:", latestBlock.number);
-    console.log("Latest block timestamp:", new Date(latestBlock.timestamp * 1000).toISOString());
+    // Format the results
+    console.log("===== SWF Token Information =====");
+    console.log(`Token Name: ${name}`);
+    console.log(`Token Symbol: ${symbol}`);
+    console.log(`Decimals: ${decimals}`);
+    console.log(`Total Supply: ${ethers.utils.formatUnits(totalSupply, decimals)} ${symbol}`);
+    console.log("\n===== Balance Information =====");
+    console.log(`Wallet Address: ${walletAddressToCheck}`);
+    console.log(`Balance: ${ethers.utils.formatUnits(balance, decimals)} ${symbol}`);
     
   } catch (error) {
-    console.error("Error:", error.message);
+    console.error("Error checking token balance:", error);
   }
 }
 
 main()
   .then(() => process.exit(0))
-  .catch(error => {
-    console.error("Unhandled error:", error);
+  .catch((error) => {
+    console.error(error);
     process.exit(1);
   });
