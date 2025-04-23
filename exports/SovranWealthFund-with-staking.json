@@ -1,0 +1,58 @@
+{
+  "name": "Sovran Wealth Fund",
+  "symbol": "SWF",
+  "description": "A comprehensive ERC20 token on Polygon blockchain with advanced smart contract capabilities, including role-based minting, pausable transactions, and token burning.",
+  "image": "https://i.imgur.com/wXbKQCH.png",
+  "decimals": 18,
+  "contractAddress": "0x15AD65Fb62CD9147Aa4443dA89828A693228b5F7",
+  "network": "polygon",
+  "social": {
+    "website": "",
+    "twitter": "",
+    "telegram": "",
+    "discord": ""
+  },
+  "attributes": [
+    {
+      "trait_type": "Token Standard",
+      "value": "ERC20"
+    },
+    {
+      "trait_type": "Features",
+      "value": "Role-based minting, Pausable, Burnable"
+    },
+    {
+      "trait_type": "Initial Supply",
+      "value": "0"
+    },
+    {
+      "trait_type": "Compliance",
+      "value": "OpenZeppelin standards"
+    },
+    {
+      "trait_type": "Staking",
+      "value": "SoloMethodEngine (5% APR)"
+    }
+  ],
+  "links": {
+    "etherscan": "https://polygonscan.com/address/0x15AD65Fb62CD9147Aa4443dA89828A693228b5F7",
+    "github": ""
+  },
+  "timestamp": "2025-04-23T08:07:49.928Z",
+  "staking": {
+    "engine": "SoloMethodEngine",
+    "engineAddress": "Enter your SoloMethodEngine address here",
+    "apr": "5%",
+    "minStake": "50 SWF",
+    "walletCount": 16,
+    "walletRoles": [
+      "BUYER",
+      "HOLDER",
+      "STAKER",
+      "LIQUIDITY",
+      "TRACKER"
+    ],
+    "rewardPeriod": "30 days"
+  },
+  "lastUpdated": "2025-04-23T08:07:49.928Z"
+}

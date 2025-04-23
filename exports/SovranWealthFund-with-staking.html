@@ -1,0 +1,289 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sovran Wealth Fund (SWF) - Token Metadata</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1 {
+      color: #1a52bd;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 10px;
+    }
+    h2 {
+      color: #2c67c9;
+      margin-top: 30px;
+    }
+    .token-img {
+      max-width: 150px;
+      border-radius: 10px;
+      display: block;
+      margin: 20px 0;
+      border: 1px solid #ddd;
+    }
+    .attributes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 20px 0;
+    }
+    .attribute {
+      background-color: #f0f4f8;
+      border-radius: 5px;
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+    .attribute span {
+      font-weight: bold;
+      color: #2c67c9;
+    }
+    pre {
+      background-color: #f5f5f5;
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+    .staking-info {
+      background-color: #edf7ed;
+      border-left: 4px solid #4caf50;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 0 5px 5px 0;
+    }
+    .address {
+      font-family: monospace;
+      background-color: #f5f5f5;
+      padding: 3px 6px;
+      border-radius: 3px;
+      font-size: 14px;
+      word-break: break-all;
+    }
+    .links a {
+      display: inline-block;
+      margin-right: 15px;
+      color: #2c67c9;
+      text-decoration: none;
+    }
+    .links a:hover {
+      text-decoration: underline;
+    }
+    .note {
+      background-color: #fff8e1;
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 14px;
+      margin: 20px 0;
+    }
+    .btn {
+      display: inline-block;
+      background-color: #2c67c9;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 5px;
+      text-decoration: none;
+      margin-top: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background-color: #f0f4f8;
+    }
+  </style>
+</head>
+<body>
+  <h1>Sovran Wealth Fund (SWF)</h1>
+  
+  <img src="https://i.imgur.com/wXbKQCH.png" alt="Sovran Wealth Fund Logo" class="token-img">
+  
+  <p>A comprehensive ERC20 token on Polygon blockchain with advanced smart contract capabilities, including role-based minting, pausable transactions, and token burning.</p>
+  
+  <h2>Token Information</h2>
+  <table>
+    <tr>
+      <th>Name</th>
+      <td>Sovran Wealth Fund</td>
+    </tr>
+    <tr>
+      <th>Symbol</th>
+      <td>SWF</td>
+    </tr>
+    <tr>
+      <th>Decimals</th>
+      <td>18</td>
+    </tr>
+    <tr>
+      <th>Network</th>
+      <td>polygon</td>
+    </tr>
+    <tr>
+      <th>Contract Address</th>
+      <td><span class="address">0x15AD65Fb62CD9147Aa4443dA89828A693228b5F7</span></td>
+    </tr>
+  </table>
+  
+  <h2>Attributes</h2>
+  <div class="attributes">
+    
+      <div class="attribute">
+        <span>Token Standard:</span> ERC20
+      </div>
+    
+      <div class="attribute">
+        <span>Features:</span> Role-based minting, Pausable, Burnable
+      </div>
+    
+      <div class="attribute">
+        <span>Initial Supply:</span> 0
+      </div>
+    
+      <div class="attribute">
+        <span>Compliance:</span> OpenZeppelin standards
+      </div>
+    
+      <div class="attribute">
+        <span>Staking:</span> SoloMethodEngine (5% APR)
+      </div>
+    
+  </div>
+  
+  <div class="staking-info">
+    <h2>Staking Information</h2>
+    <p>This token supports staking through the SoloMethodEngine smart contract.</p>
+    
+    <table>
+      <tr>
+        <th>Staking Engine</th>
+        <td>SoloMethodEngine</td>
+      </tr>
+      <tr>
+        <th>Engine Address</th>
+        <td><span class="address">Enter your SoloMethodEngine address here</span></td>
+      </tr>
+      <tr>
+        <th>Annual Reward Rate</th>
+        <td>5%</td>
+      </tr>
+      <tr>
+        <th>Minimum Stake</th>
+        <td>50 SWF</td>
+      </tr>
+      <tr>
+        <th>Reward Period</th>
+        <td>30 days</td>
+      </tr>
+    </table>
+    
+    <h3>SoloMethod 16-Wallet System</h3>
+    <p>When staking, your tokens are distributed across 16 virtual wallets with 5 different roles:</p>
+    <ul>
+      <li><strong>BUYER</strong></li><li><strong>HOLDER</strong></li><li><strong>STAKER</strong></li><li><strong>LIQUIDITY</strong></li><li><strong>TRACKER</strong></li>
+    </ul>
+  </div>
+  
+  <h2>Links</h2>
+  <div class="links">
+    <a href="https://polygonscan.com/address/0x15AD65Fb62CD9147Aa4443dA89828A693228b5F7" target="_blank">View on Polygonscan</a>
+    
+    
+    
+  </div>
+  
+  <div class="note">
+    <p><strong>Note:</strong> This HTML file was generated for easy viewing of token metadata. For integration with
+    marketplaces or other platforms, use the JSON version.</p>
+    <p>Last updated: 4/23/2025, 8:07:49 AM</p>
+  </div>
+  
+  <h2>Raw JSON Data</h2>
+  <pre>{
+  "name": "Sovran Wealth Fund",
+  "symbol": "SWF",
+  "description": "A comprehensive ERC20 token on Polygon blockchain with advanced smart contract capabilities, including role-based minting, pausable transactions, and token burning.",
+  "image": "https://i.imgur.com/wXbKQCH.png",
+  "decimals": 18,
+  "contractAddress": "0x15AD65Fb62CD9147Aa4443dA89828A693228b5F7",
+  "network": "polygon",
+  "social": {
+    "website": "",
+    "twitter": "",
+    "telegram": "",
+    "discord": ""
+  },
+  "attributes": [
+    {
+      "trait_type": "Token Standard",
+      "value": "ERC20"
+    },
+    {
+      "trait_type": "Features",
+      "value": "Role-based minting, Pausable, Burnable"
+    },
+    {
+      "trait_type": "Initial Supply",
+      "value": "0"
+    },
+    {
+      "trait_type": "Compliance",
+      "value": "OpenZeppelin standards"
+    },
+    {
+      "trait_type": "Staking",
+      "value": "SoloMethodEngine (5% APR)"
+    }
+  ],
+  "links": {
+    "etherscan": "https://polygonscan.com/address/0x15AD65Fb62CD9147Aa4443dA89828A693228b5F7",
+    "github": ""
+  },
+  "timestamp": "2025-04-23T08:07:49.928Z",
+  "staking": {
+    "engine": "SoloMethodEngine",
+    "engineAddress": "Enter your SoloMethodEngine address here",
+    "apr": "5%",
+    "minStake": "50 SWF",
+    "walletCount": 16,
+    "walletRoles": [
+      "BUYER",
+      "HOLDER",
+      "STAKER",
+      "LIQUIDITY",
+      "TRACKER"
+    ],
+    "rewardPeriod": "30 days"
+  },
+  "lastUpdated": "2025-04-23T08:07:49.928Z"
+}</pre>
+  
+  <a href="#" class="btn" onclick="copyToClipboard(); return false;">Copy JSON to Clipboard</a>
+  
+  <script>
+    function copyToClipboard() {
+      const json = "{\n  \"name\": \"Sovran Wealth Fund\",\n  \"symbol\": \"SWF\",\n  \"description\": \"A comprehensive ERC20 token on Polygon blockchain with advanced smart contract capabilities, including role-based minting, pausable transactions, and token burning.\",\n  \"image\": \"https://i.imgur.com/wXbKQCH.png\",\n  \"decimals\": 18,\n  \"contractAddress\": \"0x15AD65Fb62CD9147Aa4443dA89828A693228b5F7\",\n  \"network\": \"polygon\",\n  \"social\": {\n    \"website\": \"\",\n    \"twitter\": \"\",\n    \"telegram\": \"\",\n    \"discord\": \"\"\n  },\n  \"attributes\": [\n    {\n      \"trait_type\": \"Token Standard\",\n      \"value\": \"ERC20\"\n    },\n    {\n      \"trait_type\": \"Features\",\n      \"value\": \"Role-based minting, Pausable, Burnable\"\n    },\n    {\n      \"trait_type\": \"Initial Supply\",\n      \"value\": \"0\"\n    },\n    {\n      \"trait_type\": \"Compliance\",\n      \"value\": \"OpenZeppelin standards\"\n    },\n    {\n      \"trait_type\": \"Staking\",\n      \"value\": \"SoloMethodEngine (5% APR)\"\n    }\n  ],\n  \"links\": {\n    \"etherscan\": \"https://polygonscan.com/address/0x15AD65Fb62CD9147Aa4443dA89828A693228b5F7\",\n    \"github\": \"\"\n  },\n  \"timestamp\": \"2025-04-23T08:07:49.928Z\",\n  \"staking\": {\n    \"engine\": \"SoloMethodEngine\",\n    \"engineAddress\": \"Enter your SoloMethodEngine address here\",\n    \"apr\": \"5%\",\n    \"minStake\": \"50 SWF\",\n    \"walletCount\": 16,\n    \"walletRoles\": [\n      \"BUYER\",\n      \"HOLDER\",\n      \"STAKER\",\n      \"LIQUIDITY\",\n      \"TRACKER\"\n    ],\n    \"rewardPeriod\": \"30 days\"\n  },\n  \"lastUpdated\": \"2025-04-23T08:07:49.928Z\"\n}";
+      navigator.clipboard.writeText(json).then(() => {
+        alert('JSON copied to clipboard!');
+      }, (err) => {
+        console.error('Could not copy text: ', err);
+      });
+    }
+  </script>
+</body>
+</html>

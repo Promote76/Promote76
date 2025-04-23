@@ -1,13 +1,10 @@
-// token-metadata-export.js - Simple metadata exporter for Sovran Wealth Fund token
+#!/usr/bin/env node
+// Script to export SWF token metadata with SoloMethodEngine details to both JSON and HTML formats
+// This can be used when IPFS uploads fail or for manual uploading to other platforms
+
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
-
-// Load token metadata
-const metadata = JSON.parse(fs.readFileSync('./SovranWealthFund.token.json', 'utf8'));
-
-// Update timestamp to current time
-metadata.timestamp = new Date().toISOString();
 
 // Create exports directory if it doesn't exist
 const exportsDir = path.join(__dirname, 'exports');
@@ -15,11 +12,48 @@ if (!fs.existsSync(exportsDir)) {
   fs.mkdirSync(exportsDir);
 }
 
-// Export as JSON
-const jsonFilePath = path.join(exportsDir, 'SovranWealthFund.token.json');
-fs.writeFileSync(jsonFilePath, JSON.stringify(metadata, null, 2));
+// Load the base token metadata 
+let metadata;
+try {
+  metadata = JSON.parse(fs.readFileSync('./SovranWealthFund.token.json', 'utf8'));
+} catch (error) {
+  console.error('Error loading token metadata:', error.message);
+  process.exit(1);
+}
 
-// Export as HTML for easy viewing
+// Add SoloMethodEngine staking information to the metadata
+const soloMethodEngineAddress = process.env.SOLO_METHOD_ENGINE_ADDRESS || "Enter your SoloMethodEngine address here";
+
+// Update metadata with staking details
+metadata.staking = {
+  engine: "SoloMethodEngine",
+  engineAddress: soloMethodEngineAddress,
+  apr: "5%",
+  minStake: "50 SWF",
+  walletCount: 16,
+  walletRoles: ["BUYER", "HOLDER", "STAKER", "LIQUIDITY", "TRACKER"],
+  rewardPeriod: "30 days"
+};
+
+// Add staking-related attributes if they don't exist
+const hasStakingAttribute = metadata.attributes.some(attr => attr.trait_type === "Staking");
+if (!hasStakingAttribute) {
+  metadata.attributes.push({
+    trait_type: "Staking",
+    value: "SoloMethodEngine (5% APR)"
+  });
+}
+
+// Update timestamp
+metadata.timestamp = new Date().toISOString();
+metadata.lastUpdated = new Date().toISOString();
+
+// Export to JSON file
+const jsonOutputPath = path.join(exportsDir, 'SovranWealthFund-with-staking.json');
+fs.writeFileSync(jsonOutputPath, JSON.stringify(metadata, null, 2));
+console.log(`Token metadata exported to ${jsonOutputPath}`);
+
+// Create HTML version for easy viewing and manual upload
 const htmlContent = `
 <!DOCTYPE html>
 <html lang="en">
@@ -29,7 +63,7 @@ const htmlContent = `
   <title>${metadata.name} (${metadata.symbol}) - Token Metadata</title>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: Arial, sans-serif;
       line-height: 1.6;
       color: #333;
       max-width: 800px;
@@ -37,174 +71,218 @@ const htmlContent = `
       padding: 20px;
     }
     h1 {
-      color: #2c3e50;
+      color: #1a52bd;
       border-bottom: 2px solid #eee;
       padding-bottom: 10px;
     }
-    .token-image {
-      max-width: 200px;
+    h2 {
+      color: #2c67c9;
+      margin-top: 30px;
+    }
+    .token-img {
+      max-width: 150px;
       border-radius: 10px;
       display: block;
       margin: 20px 0;
-    }
-    .metadata-section {
-      margin-bottom: 30px;
-      background-color: #f8f9fa;
-      padding: 15px;
-      border-radius: 5px;
+      border: 1px solid #ddd;
     }
     .attributes {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
+      margin: 20px 0;
     }
     .attribute {
-      background-color: #e9ecef;
-      padding: 10px;
+      background-color: #f0f4f8;
       border-radius: 5px;
-      flex: 1 1 200px;
+      padding: 8px 12px;
+      font-size: 14px;
     }
-    .attribute h4 {
-      margin: 0 0 5px 0;
-      color: #495057;
-    }
-    .attribute p {
-      margin: 0;
+    .attribute span {
       font-weight: bold;
+      color: #2c67c9;
     }
-    .links {
-      margin-top: 20px;
+    pre {
+      background-color: #f5f5f5;
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+    .staking-info {
+      background-color: #edf7ed;
+      border-left: 4px solid #4caf50;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 0 5px 5px 0;
+    }
+    .address {
+      font-family: monospace;
+      background-color: #f5f5f5;
+      padding: 3px 6px;
+      border-radius: 3px;
+      font-size: 14px;
+      word-break: break-all;
     }
     .links a {
       display: inline-block;
       margin-right: 15px;
+      color: #2c67c9;
       text-decoration: none;
-      color: #0066cc;
     }
-    .contract-address {
-      font-family: monospace;
-      background-color: #e9ecef;
-      padding: 5px 10px;
-      border-radius: 3px;
-      word-break: break-all;
+    .links a:hover {
+      text-decoration: underline;
     }
-    .timestamp {
-      color: #6c757d;
-      font-size: 0.9em;
-      margin-top: 30px;
-      text-align: right;
+    .note {
+      background-color: #fff8e1;
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 14px;
+      margin: 20px 0;
+    }
+    .btn {
+      display: inline-block;
+      background-color: #2c67c9;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 5px;
+      text-decoration: none;
+      margin-top: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background-color: #f0f4f8;
     }
   </style>
 </head>
 <body>
   <h1>${metadata.name} (${metadata.symbol})</h1>
   
-  <div class="metadata-section">
-    <img src="${metadata.image}" alt="${metadata.name} Logo" class="token-image">
-    <p>${metadata.description}</p>
-    <p><strong>Decimals:</strong> ${metadata.decimals}</p>
-    <p><strong>Network:</strong> ${metadata.network}</p>
-    <p><strong>Contract Address:</strong> <span class="contract-address">${metadata.contractAddress}</span></p>
+  ${metadata.image ? `<img src="${metadata.image}" alt="${metadata.name} Logo" class="token-img">` : ''}
+  
+  <p>${metadata.description}</p>
+  
+  <h2>Token Information</h2>
+  <table>
+    <tr>
+      <th>Name</th>
+      <td>${metadata.name}</td>
+    </tr>
+    <tr>
+      <th>Symbol</th>
+      <td>${metadata.symbol}</td>
+    </tr>
+    <tr>
+      <th>Decimals</th>
+      <td>${metadata.decimals}</td>
+    </tr>
+    <tr>
+      <th>Network</th>
+      <td>${metadata.network || 'Polygon'}</td>
+    </tr>
+    <tr>
+      <th>Contract Address</th>
+      <td><span class="address">${metadata.contractAddress}</span></td>
+    </tr>
+  </table>
+  
+  <h2>Attributes</h2>
+  <div class="attributes">
+    ${metadata.attributes.map(attr => `
+      <div class="attribute">
+        <span>${attr.trait_type}:</span> ${attr.value}
+      </div>
+    `).join('')}
   </div>
   
-  <div class="metadata-section">
-    <h2>Attributes</h2>
-    <div class="attributes">
-      ${metadata.attributes.map(attr => `
-        <div class="attribute">
-          <h4>${attr.trait_type}</h4>
-          <p>${attr.value}</p>
-        </div>
-      `).join('')}
-    </div>
+  <div class="staking-info">
+    <h2>Staking Information</h2>
+    <p>This token supports staking through the SoloMethodEngine smart contract.</p>
+    
+    <table>
+      <tr>
+        <th>Staking Engine</th>
+        <td>${metadata.staking.engine}</td>
+      </tr>
+      <tr>
+        <th>Engine Address</th>
+        <td><span class="address">${metadata.staking.engineAddress}</span></td>
+      </tr>
+      <tr>
+        <th>Annual Reward Rate</th>
+        <td>${metadata.staking.apr}</td>
+      </tr>
+      <tr>
+        <th>Minimum Stake</th>
+        <td>${metadata.staking.minStake}</td>
+      </tr>
+      <tr>
+        <th>Reward Period</th>
+        <td>${metadata.staking.rewardPeriod}</td>
+      </tr>
+    </table>
+    
+    <h3>SoloMethod 16-Wallet System</h3>
+    <p>When staking, your tokens are distributed across 16 virtual wallets with 5 different roles:</p>
+    <ul>
+      ${metadata.staking.walletRoles.map(role => `<li><strong>${role}</strong></li>`).join('')}
+    </ul>
   </div>
   
-  <div class="metadata-section">
-    <h2>Links</h2>
-    <div class="links">
-      ${metadata.links.etherscan ? `<a href="${metadata.links.etherscan}" target="_blank">View on Polygonscan</a>` : ''}
-      ${metadata.links.github ? `<a href="${metadata.links.github}" target="_blank">GitHub Repository</a>` : ''}
-    </div>
+  <h2>Links</h2>
+  <div class="links">
+    ${metadata.links && metadata.links.etherscan ? 
+      `<a href="${metadata.links.etherscan}" target="_blank">View on Polygonscan</a>` : ''}
+    ${metadata.links && metadata.links.github ? 
+      `<a href="${metadata.links.github}" target="_blank">GitHub Repository</a>` : ''}
+    ${metadata.social && metadata.social.website ? 
+      `<a href="${metadata.social.website}" target="_blank">Website</a>` : ''}
+    ${metadata.social && metadata.social.twitter ? 
+      `<a href="${metadata.social.twitter}" target="_blank">Twitter</a>` : ''}
   </div>
   
-  ${metadata.social && Object.values(metadata.social).some(v => v) ? `
-  <div class="metadata-section">
-    <h2>Social</h2>
-    <div class="links">
-      ${metadata.social.website ? `<a href="${metadata.social.website}" target="_blank">Website</a>` : ''}
-      ${metadata.social.twitter ? `<a href="${metadata.social.twitter}" target="_blank">Twitter</a>` : ''}
-      ${metadata.social.telegram ? `<a href="${metadata.social.telegram}" target="_blank">Telegram</a>` : ''}
-      ${metadata.social.discord ? `<a href="${metadata.social.discord}" target="_blank">Discord</a>` : ''}
-    </div>
+  <div class="note">
+    <p><strong>Note:</strong> This HTML file was generated for easy viewing of token metadata. For integration with
+    marketplaces or other platforms, use the JSON version.</p>
+    <p>Last updated: ${new Date().toLocaleString()}</p>
   </div>
-  ` : ''}
   
-  <p class="timestamp">Last Updated: ${metadata.timestamp}</p>
+  <h2>Raw JSON Data</h2>
+  <pre>${JSON.stringify(metadata, null, 2)}</pre>
+  
+  <a href="#" class="btn" onclick="copyToClipboard(); return false;">Copy JSON to Clipboard</a>
+  
+  <script>
+    function copyToClipboard() {
+      const json = ${JSON.stringify(JSON.stringify(metadata, null, 2))};
+      navigator.clipboard.writeText(json).then(() => {
+        alert('JSON copied to clipboard!');
+      }, (err) => {
+        console.error('Could not copy text: ', err);
+      });
+    }
+  </script>
 </body>
 </html>
 `;
 
-const htmlFilePath = path.join(exportsDir, 'SovranWealthFund.token.html');
-fs.writeFileSync(htmlFilePath, htmlContent);
+// Export to HTML file
+const htmlOutputPath = path.join(exportsDir, 'SovranWealthFund-with-staking.html');
+fs.writeFileSync(htmlOutputPath, htmlContent);
+console.log(`HTML visualization exported to ${htmlOutputPath}`);
 
-// Create a manual upload guide
-const uploadGuideContent = `# Sovran Wealth Fund Token Metadata Upload Guide
-
-This guide helps you manually upload your token metadata to decentralized storage systems like IPFS.
-
-## Files Ready for Upload
-
-The following files have been prepared in the 'exports' directory:
-
-1. \`SovranWealthFund.token.json\` - The token metadata in JSON format
-2. \`SovranWealthFund.token.html\` - A HTML representation of the token metadata for easy viewing
-
-## Manual Upload Options
-
-### Option 1: Pinata (Recommended)
-
-1. Go to [Pinata](https://www.pinata.cloud/) and create a free account
-2. Click "Upload" and select the \`SovranWealthFund.token.json\` file from the 'exports' directory
-3. Once uploaded, you'll receive a CID (Content Identifier)
-4. Your metadata will be accessible at:
-   - IPFS URI: ipfs://{CID}
-   - Gateway URL: https://gateway.pinata.cloud/ipfs/{CID}
-
-### Option 2: NFT.Storage Web Interface
-
-1. Go to [NFT.Storage](https://nft.storage/) and create an account
-2. Use the web interface to upload the \`SovranWealthFund.token.json\` file
-3. Once uploaded, you'll receive a CID
-4. Your metadata will be accessible at:
-   - IPFS URI: ipfs://{CID}
-   - Gateway URL: https://{CID}.ipfs.nftstorage.link
-
-### Option 3: Web3.Storage Web Interface
-
-1. Go to [Web3.Storage](https://web3.storage/) and create an account
-2. Use the web interface to upload the \`SovranWealthFund.token.json\` file
-3. Once uploaded, you'll receive a CID
-4. Your metadata will be accessible at:
-   - IPFS URI: ipfs://{CID}
-   - Gateway URL: https://{CID}.ipfs.dweb.link
-
-## After Uploading
-
-After successfully uploading the file, you should:
-
-1. Save the CID and IPFS URI for future reference
-2. Test accessing the file through a public gateway to ensure it's properly uploaded
-3. Consider submitting the CID to additional IPFS pinning services for redundancy
-
-Remember that IPFS is content-addressed, so the same file will always have the same CID regardless of where it's uploaded.
-`;
-
-const uploadGuidePath = path.join(exportsDir, 'UPLOAD_GUIDE.md');
-fs.writeFileSync(uploadGuidePath, uploadGuideContent);
-
-// Print output
-console.log('✅ Token metadata exported successfully!');
-console.log(`JSON file: ${jsonFilePath}`);
-console.log(`HTML file: ${htmlFilePath}`);
-console.log(`Upload guide: ${uploadGuidePath}`);
-console.log('\nFollow the instructions in the upload guide to manually upload to IPFS.');
+console.log('\nExport Complete! ✅');
+console.log('You can now:');
+console.log('1. Upload the JSON file to IPFS manually');
+console.log('2. Open the HTML file in any browser to view and share the token information');
+console.log('3. Copy the JSON data directly from the HTML page using the provided button');
