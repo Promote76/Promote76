@@ -1,0 +1,51 @@
+modules = ["nodejs-20"]
+
+[nix]
+channel = "stable-24_05"
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Deploy Sovran Wealth Fund Token"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "check_dependencies"
+
+[[workflows.workflow]]
+name = "Deploy Sovran Wealth Fund Token"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm install --save-dev hardhat @nomiclabs/hardhat-ethers ethers@^5.0.0 @thirdweb-dev/contracts && npx hardhat run scripts/deploy.js --network mumbai"
+
+[[workflows.workflow]]
+name = "check_dependencies"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm list --depth=0 && echo \"Checking hardhat...\" && npx hardhat --version"
+
+[deployment]
+run = ["sh", "-c", "npm install --save-dev hardhat @nomiclabs/hardhat-ethers ethers@^5.0.0 @thirdweb-dev/contracts && npx hardhat run scripts/deploy.js --network mumbai"]
