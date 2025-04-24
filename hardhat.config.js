@@ -23,7 +23,13 @@ module.exports = {
       accounts: [process.env.PRIVATE_KEY],
       gasPrice: 35000000000, // 35 gwei
       timeout: 120000, // 120 seconds
-      chainId: 80002
+      chainId: 80002,
+      verify: {
+        etherscan: {
+          apiKey: process.env.POLYGONSCAN_API_KEY
+        }
+      },
+      networkCheckTimeout: 100000
     }
   },
   etherscan: {
