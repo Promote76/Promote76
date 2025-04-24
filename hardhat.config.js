@@ -19,10 +19,11 @@ module.exports = {
     },
     hardhat: {},
     amoy: {
-      url: `https://polygon-amoy.infura.io/v3/${process.env.ALCHEMY_API_KEY}`,
+      url: "https://polygon-amoy.g.alchemy.com/v2/" + process.env.ALCHEMY_API_KEY,
       accounts: [process.env.PRIVATE_KEY],
-      gasPrice: 25000000000, // 25 gwei
-      timeout: 60000 // 60 seconds
+      gasPrice: 35000000000, // 35 gwei
+      timeout: 120000, // 120 seconds
+      chainId: 80002
     }
   },
   etherscan: {
